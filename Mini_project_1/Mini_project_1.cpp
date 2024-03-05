@@ -8,25 +8,37 @@
 
 #include"gnuplot-iostream.h"
 #include"AudioSignal.h"
+#include"Wav.h"
 
 
 int main()
 {
-    std::vector<std::pair<int, int>> signal_values;
-    for (int i = 0; i < 5; i++)
-    {
-        std::pair<int, int> tmp;
-        tmp.first = i;
-        tmp.second = (i);
-        signal_values.push_back(tmp);
-    }
   
     double sampling_rate = 44100; // Hz
-    AudioSignal signal(signal_values, sampling_rate);
+    //AudioSignal signal(signal_values, sampling_rate);
 
-    signal.plot();
-    signal.timeShift(-2);
+    Wav sample_wav("../assets/test.wav");
+    sample_wav.read();
+    AudioSignal sample_signal(sample_wav.toSignals(), sampling_rate);
+
+    Wav sample_wav2("../assets/test2.wav");
+    sample_wav2.read();
+    AudioSignal sample_signal2(sample_wav2.toSignals(), sampling_rate);
     
+    //sample_signal.timeShift(-10000);
+    AudioSignal sample_signal3 = sample_signal.multiply(2);
+    sample_signal3.plot1();
+    //sample_signal2.timeShift(10000);
+    //sample_signal2.plot1();
+    //AudioSignal addSignal = sample_signal + sample_signal2;
+
+    //addSignal.plot1();
+    //sample_wav.playWav();
+    //sample_wav.printData();
+
+
+    //sample_signal.plot1();
+    //sample_signal.plot1();
+
     return 0;
 }
-
