@@ -29,13 +29,10 @@ class Wav
 public:
     Wav(const std::string& filename);
 
-    void read();
-    bool write(const std::string& filename);
     std::vector<std::pair<double, double>> toSignals();
 
     void printData();
     void playWav(std::string ref_Filename = "");
-    std::string changeRate(int rate);
 private:
     std::string filename;
     std::vector<double> data;

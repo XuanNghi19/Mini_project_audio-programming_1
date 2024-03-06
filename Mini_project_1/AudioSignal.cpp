@@ -42,13 +42,13 @@ void AudioSignal::timeShift(int pandemic) {
         }
     }
 
-
+    
     values = shifted_values;
 }
 
-void AudioSignal::plot1() const {
+void AudioSignal::plot() const {
     Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
-
+    
     gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
     gp << "plot '-' with points pointtype 7 title 'Point', '-' with lines title 'Line'" << std::endl;
 
@@ -65,25 +65,6 @@ void AudioSignal::plot1() const {
         gp << std::endl;
     }
     
-    gp << "e" << std::endl;
-
-
-    std::cout << "Press enter to out!";
-    std::cin.get();
-}
-
-void AudioSignal::plot2() const {
-
-    Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
-
-    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
-    gp << "plot '-' with lines title 'Line'" << std::endl;
-
-    for (int i = 0; i < values.size(); i++)
-    {
-        gp << values[i].second << std::endl;
-    }
-
     gp << "e" << std::endl;
 
 
@@ -115,7 +96,7 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
         return AudioSignal(result, 0.0);
     }
 
-    size_t i = 0, j = 0;
+    long long i = 0, j = 0;
 
     while (i < values.size() || j < other.values.size()) {
         if (i < values.size() && j < other.values.size()) {
@@ -148,7 +129,7 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
 
 AudioSignal AudioSignal::multiply(double constant) const {
     std::vector<std::pair<double, double>> result = this->values;
-    for (int i = 0; i < this->values.size(); i++) {
+    for (long long i = 0; i < this->values.size(); i++) {
         result[i].second *= constant;
     }
     return AudioSignal(result, rate);
