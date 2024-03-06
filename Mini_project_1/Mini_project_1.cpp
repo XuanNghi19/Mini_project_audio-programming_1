@@ -14,20 +14,20 @@
 int main()
 {
 
-    double sampling_rate = 18000; // Hz
-    //AudioSignal signal(signal_values, sampling_rate);
-
     Wav sample_wav("../assets/test.wav");
-    sample_wav.read();
     /*sample_wav.playWav();*/
-    //sample_wav.printData();
 
-    AudioSignal sample_signal(sample_wav.toSignals(), sampling_rate);
+    //AudioSignal sample_signal(sample_wav.toSignals(), 44100);
+    //std::vector<std::pair<double, double>> values;
+    //values.push_back({ 0, 1 });
+    //values.push_back({ 1, 2 });
+    //values.push_back({ 2, 3 });
+    //values.push_back({ 3, 4 });
+    //values.push_back({ 4, 5 });
+    AudioSignal sample_signal(sample_wav.toSignals(), 44100);
     /*sample_signal.plot1();*/
-    /*sample_signal.timeShift(-10000);
-    sample_signal.plot1();
-    sample_signal.reverseTime();*/
-    sample_signal.upsample(2);
+    /*sample_signal.upsample(5);*/
+    sample_signal.writeWavFile();
 
     return 0;
 }

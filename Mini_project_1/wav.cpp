@@ -8,25 +8,7 @@
 #include"gnuplot-iostream.h"
 
 
-Wav::Wav(const std::string& filename) : filename(filename) {}
-
-//bool Wav::read() {
-//    std::ifstream file(filename, std::ios::binary);
-//    if (!file) {
-//        std::cerr << "Không thể mở file." << std::endl;
-//        return false;
-//    }
-//
-//    file.seekg(44);
-//    short sample;
-//    while (file.read(reinterpret_cast<char*>(&sample), sizeof(short))) {
-//        this->data.push_back(static_cast<double>(sample));
-//    }
-//
-//    return true;
-//}
-
-void Wav::read() {
+Wav::Wav(const std::string& filename) : filename(filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
         std::cerr << "Error: Couldn't open file: " << filename << std::endl;
@@ -35,13 +17,8 @@ void Wav::read() {
 
     file.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    if (std::string(header.riff, 4) != "RIFF" ||
-        std::string(header.wave, 4) != "WAVE" ||
-        std::string(header.fmt, 4) != "fmt " ||
-        header.audioFormat != 1) {
-        std::cerr << "Error: Invalid WAV file format." << std::endl;
-        return;
-    }
+    std::cout << "sampleRate    : " << header.sampleRate << std::endl;
+
 
     if (header.bitsPerSample != 16) {
         std::cerr << "Error: Only 16-bit audio is supported." << std::endl;
@@ -53,21 +30,10 @@ void Wav::read() {
 
     int16_t sample;
     while (file.read(reinterpret_cast<char*>(&sample), sizeof(int16_t))) {
-        this->data.push_back(static_cast<double>(sample) / std::pow(2, header.bitsPerSample - 1));
+        this->data.push_back(static_cast<double>(sample));
     }
-
 }
 
-bool Wav::write(const std::string& filename) {
-    std::ofstream file(filename, std::ios::binary);
-    if (!file) {
-        std::cerr << "Không thể mở file." << std::endl;
-        return false;
-    }
-
-
-    return true;
-}
 
 void Wav::playWav(std::string ref_Filename) {
 

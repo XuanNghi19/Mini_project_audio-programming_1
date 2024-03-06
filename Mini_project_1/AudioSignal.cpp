@@ -2,6 +2,7 @@
 #include<numeric>
 #include "AudioSignal.h"
 #include "gnuplot-iostream.h"
+#include "wav.h"
 
 AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double rate)
 {
@@ -63,7 +64,8 @@ void AudioSignal::reverseTime() {
 }
 
 void AudioSignal::downsample(int M)
-{
+{   
+    rate /= M;
     // Tạo một vector mới để lưu trữ dữ liệu đã giảm tần số lấy mẫu
     std::vector<std::pair<double, double>> downsampled_values;
 
@@ -83,34 +85,69 @@ void AudioSignal::downsample(int M)
     // Hiển thị dữ liệu âm thanh đã giảm tần số lấy mẫu
     plot1();
 }
+
+
 void AudioSignal::upsample(int L) {
+    rate *= L;
     // Tạo một vector mới để lưu trữ dữ liệu đã tăng tần số lấy mẫu
     std::vector<std::pair<double, double>> upsampled_values;
 
-    // Tính toán dữ liệu tăng tần số lấy mẫu với nội suy
-    for (int i = 0; i < values.size(); ++i) {
-        // Thêm mẫu gốc vào vector kết quả
-        upsampled_values.push_back(values[i]);
+    long long bufferupsample = values[0].first;
+    std::pair<double, double> tmp;
 
-        // Nếu không phải mẫu cuối cùng và không phải mẫu mà không thể nội suy được
-        if (i < values.size() - 1 && (values[i + 1].first - values[i].first) > L) {
-            // Nội suy L − 1 mẫu giữa các mẫu gốc
-            for (int j = 1; j < L; ++j) {
-                int interpolated_time = values[i].first + j * (values[i + 1].first - values[i].first) / L;
-                upsampled_values.push_back(std::make_pair(interpolated_time, 0)); // Nội suy với giá trị mặc định là 0
-            }
+    for (int i = 0; i < values.size(); ++i) {
+        if (i != 0) {
+            bufferupsample++;
+        }
+        tmp.second = values[i].second;
+        tmp.first = bufferupsample;
+        upsampled_values.push_back(tmp);
+        if (i == values.size() - 1) {
+            break;
+        }
+
+        // noi suy
+        for (int j = 1; j < L; ++j) {
+
+            bufferupsample++;
+            upsampled_values.push_back({ bufferupsample, 0});
         }
     }
 
-    // Gán lại giá trị đã tăng tần số lấy mẫu cho vector giá trị âm thanh gốc
     values = upsampled_values;
 
-    // Hiển thị dữ liệu âm thanh đã tăng tần số lấy mẫu
-    plot1();
+    plot2();
 }
+void AudioSignal::writeWavFile() {
 
 
+    uint16_t channels = 1; // mono
+    uint32_t rate = this->rate; // Hz
+    uint16_t bitsPerSample = 16; // bits/sample
+    uint32_t dataSize = values.size() * channels * bitsPerSample / 8; // kích thước dữ liệu âm thanh
+    WavHeader header(channels, rate, bitsPerSample, dataSize);
 
+    // Tên file đầu ra
+    std::string filename = "../assets/output.wav";
+    // Mở một file để ghi dữ liệu âm thanh vào
+    std::ofstream outFile(filename, std::ios::binary);
+
+    if (!outFile.is_open()) {
+        std::cerr << "Không thể mở file để ghi dữ liệu." << std::endl;
+        return;
+    }
+
+    outFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+    for (const auto& sample : values) {
+        int16_t sampleValue = static_cast<int16_t>(sample.second);
+        outFile.write(reinterpret_cast<const char*>(&sampleValue), sizeof(sampleValue));
+    }
+
+    outFile.close();
+
+    std::cout << "File WAV '" << filename << "' đã được ghi thành công." << std::endl;
+}
 
 void AudioSignal::plot1() const {
     Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");

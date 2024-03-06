@@ -8,6 +8,7 @@ public:
 	void timeShift(int shift_samples);
 	void plot1() const;
 	void plot2() const;
+	void writeWavFile();
 
 	std::vector<std::pair<double, double>> getValues();
 	void setValues(std::vector<std::pair<double, double>> values);
