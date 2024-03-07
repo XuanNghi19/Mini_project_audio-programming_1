@@ -57,7 +57,7 @@ void timeShifting() {
     Wav tmp_Wav(filePath);
     AudioSignal tmp_AudioSignal(tmp_Wav.toSignals(), 44200);
     tmp_AudioSignal.timeShift(1000);
-    tmp_AudioSignal.plot();
+    tmp_AudioSignal.plot1();
 }
 
 int main()
