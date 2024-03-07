@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 #include <SFML/Audio.hpp>
@@ -22,6 +22,18 @@ struct WavHeader {
     // Subchunk 2 (data)
     char subchunk2Id[4];    // Subchunk 2 ID: "data"
     uint32_t subchunk2Size; // Subchunk 2 size (data size)
+
+    // Hàm khởi tạo
+    WavHeader(uint16_t channels, uint32_t rate, uint16_t bitsPerSample, uint32_t dataSize) {
+        numChannels = channels;
+        sampleRate = rate;
+        this->bitsPerSample = bitsPerSample;
+        byteRate = sampleRate * numChannels * bitsPerSample / 8;
+        blockAlign = numChannels * bitsPerSample / 8;
+        chunkSize = 36 + dataSize; // 36 = kích thước header cố định
+        subchunk2Size = dataSize;
+    }
+    WavHeader() {}
 };
 
 class Wav

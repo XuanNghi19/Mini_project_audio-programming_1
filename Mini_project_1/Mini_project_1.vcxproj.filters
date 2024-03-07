@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="assets">
-      <UniqueIdentifier>{4e144e8d-8ade-4e80-a232-e1ed472dda89}</UniqueIdentifier>
+      <UniqueIdentifier>{2fa54084-c950-4f3b-a42a-03b20d94d03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -6,18 +6,20 @@ class AudioSignal
 public:
 	AudioSignal(std::vector<std::pair<double, double>> values, double sampling_rate);
 	void timeShift(int shift_samples);
-	void plot() const;
+	void plot1() const;
+	void plot2() const;
+	void writeWavFile();
 
 	std::vector<std::pair<double, double>> getValues();
 	void setValues(std::vector<std::pair<double, double>> values);
 	double getRate();
 	void setRate(double rate);
-
+	void reverseTime();
+	void downsample(int M);
+	void upsample(int L);
 	AudioSignal operator+(const AudioSignal& other) const;
 	AudioSignal multiply(double constant) const;
-
 private:
 	std::vector<std::pair<double, double>> values;
 	double rate;
 };
-

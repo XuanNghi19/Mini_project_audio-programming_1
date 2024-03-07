@@ -2,11 +2,12 @@
 #include<numeric>
 #include "AudioSignal.h"
 #include "gnuplot-iostream.h"
+#include "wav.h"
 
 AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double rate)
 {
-	this->values = values;
-	this->rate = rate;
+    this->values = values;
+    this->rate = rate;
 }
 
 
@@ -46,7 +47,110 @@ void AudioSignal::timeShift(int pandemic) {
     values = shifted_values;
 }
 
-void AudioSignal::plot() const {
+void AudioSignal::reverseTime() {
+    // Tạo một bản sao của vector giá trị âm thanh
+    std::vector<std::pair<double, double>> reversed_values = values;
+
+    // Đảo ngược chỉ số thời gian
+    for (int i = 0; i < reversed_values.size(); ++i) {
+        reversed_values[i].first = -reversed_values[i].first;
+        // Lưu ý rằng nếu chỉ số thời gian ban đầu là dương, thì sau khi đảo ngược nó sẽ trở thành âm và ngược lại.
+    }
+
+    // Gán lại giá trị đảo ngược thời gian cho vector giá trị âm thanh gốc
+    values = reversed_values;
+
+    // Hiển thị dữ liệu âm thanh đã đảo ngược thời gian
+    plot1();
+}
+
+void AudioSignal::downsample(int M)
+{   
+    rate /= M;
+    // Tạo một vector mới để lưu trữ dữ liệu đã giảm tần số lấy mẫu
+    std::vector<std::pair<double, double>> downsampled_values;
+
+    // Lấy mẫu mỗi M mẫu
+    long long j = 0;
+    for (long long i = 0; i < values.size(); i += M) {
+        std::pair<double, double> tmp;
+        tmp.second = values[i].second;
+        tmp.first = j;
+        j++;
+        downsampled_values.push_back(tmp);
+    }
+
+    // Gán lại giá trị đã giảm tần số lấy mẫu cho vector giá trị âm thanh gốc
+    values = downsampled_values;
+
+    // Hiển thị dữ liệu âm thanh đã giảm tần số lấy mẫu
+    plot1();
+}
+
+
+void AudioSignal::upsample(int L) {
+    rate *= L;
+    // Tạo một vector mới để lưu trữ dữ liệu đã tăng tần số lấy mẫu
+    std::vector<std::pair<double, double>> upsampled_values;
+
+    long long bufferupsample = values[0].first;
+    std::pair<double, double> tmp;
+
+    for (int i = 0; i < values.size(); ++i) {
+        if (i != 0) {
+            bufferupsample++;
+        }
+        tmp.second = values[i].second;
+        tmp.first = bufferupsample;
+        upsampled_values.push_back(tmp);
+        if (i == values.size() - 1) {
+            break;
+        }
+
+        // noi suy
+        for (int j = 1; j < L; ++j) {
+
+            bufferupsample++;
+            upsampled_values.push_back({ bufferupsample, 0});
+        }
+    }
+
+    values = upsampled_values;
+
+    plot2();
+}
+void AudioSignal::writeWavFile() {
+
+
+    uint16_t channels = 1; // mono
+    uint32_t rate = this->rate; // Hz
+    uint16_t bitsPerSample = 16; // bits/sample
+    uint32_t dataSize = values.size() * channels * bitsPerSample / 8; // kích thước dữ liệu âm thanh
+    WavHeader header(channels, rate, bitsPerSample, dataSize);
+
+    // Tên file đầu ra
+    std::string filename = "../assets/output.wav";
+    // Mở một file để ghi dữ liệu âm thanh vào
+    std::ofstream outFile(filename, std::ios::binary);
+
+    if (!outFile.is_open()) {
+        std::cerr << "Không thể mở file để ghi dữ liệu." << std::endl;
+        return;
+    }
+
+    outFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+    for (const auto& sample : values) {
+        int16_t sampleValue = static_cast<int16_t>(sample.second);
+        outFile.write(reinterpret_cast<const char*>(&sampleValue), sizeof(sampleValue));
+    }
+
+    outFile.close();
+
+    std::cout << "File WAV '" << filename << "' đã được ghi thành công." << std::endl;
+}
+
+void AudioSignal::plot1() const {
     Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
     
     gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
@@ -64,7 +168,26 @@ void AudioSignal::plot() const {
         gp << values[i].first << " 0" << std::endl;
         gp << std::endl;
     }
-    
+
+    gp << "e" << std::endl;
+
+
+    std::cout << "Press enter to out!";
+    std::cin.get();
+}
+
+void AudioSignal::plot2() const {
+
+    Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
+
+    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
+    gp << "plot '-' with lines title 'Line'" << std::endl;
+
+    for (int i = 0; i < values.size(); i++)
+    {
+        gp << values[i].second << std::endl;
+    }
+
     gp << "e" << std::endl;
 
 
