@@ -10,12 +10,11 @@ AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double r
     this->rate = rate;
 }
 
-
-void AudioSignal::timeShift(int pandemic) {
+void AudioSignal::timeShift(long long pandemic) {
     std::vector<std::pair<double, double>> shifted_values(values.size() + std::abs(pandemic));
 
     if (pandemic < 0) {
-        for (int i = 0; i < shifted_values.size(); i++)
+        for (long long i = 0; i < shifted_values.size(); i++)
         {
             if (i < values.size()) {
                 shifted_values[i].first = values[i].first + pandemic;
@@ -29,7 +28,7 @@ void AudioSignal::timeShift(int pandemic) {
         }
     }
     else if (pandemic > 0) {
-        for (int i = shifted_values.size() - 1; i >= 0; i--)
+        for (long long i = shifted_values.size() - 1; i >= 0; i--)
         {
             if (i > pandemic) {
                 shifted_values[i].first = values[i - pandemic].first + pandemic;
@@ -45,6 +44,7 @@ void AudioSignal::timeShift(int pandemic) {
 
     
     values = shifted_values;
+    std::cout << "Time Shifting success!\n";
 }
 
 void AudioSignal::reverseTime() {
@@ -52,22 +52,16 @@ void AudioSignal::reverseTime() {
     std::vector<std::pair<double, double>> reversed_values = values;
 
     // Đảo ngược chỉ số thời gian
-    for (int i = 0; i < reversed_values.size(); ++i) {
+    for (long long i = 0; i < reversed_values.size(); ++i) {
         reversed_values[i].first = -reversed_values[i].first;
-        // Lưu ý rằng nếu chỉ số thời gian ban đầu là dương, thì sau khi đảo ngược nó sẽ trở thành âm và ngược lại.
     }
 
-    // Gán lại giá trị đảo ngược thời gian cho vector giá trị âm thanh gốc
     values = reversed_values;
-
-    // Hiển thị dữ liệu âm thanh đã đảo ngược thời gian
-    plot1();
 }
 
 void AudioSignal::downsample(int M)
 {   
     rate /= M;
-    // Tạo một vector mới để lưu trữ dữ liệu đã giảm tần số lấy mẫu
     std::vector<std::pair<double, double>> downsampled_values;
 
     // Lấy mẫu mỗi M mẫu
@@ -79,24 +73,17 @@ void AudioSignal::downsample(int M)
         j++;
         downsampled_values.push_back(tmp);
     }
-
-    // Gán lại giá trị đã giảm tần số lấy mẫu cho vector giá trị âm thanh gốc
     values = downsampled_values;
-
-    // Hiển thị dữ liệu âm thanh đã giảm tần số lấy mẫu
-    plot1();
 }
-
 
 void AudioSignal::upsample(int L) {
     rate *= L;
-    // Tạo một vector mới để lưu trữ dữ liệu đã tăng tần số lấy mẫu
     std::vector<std::pair<double, double>> upsampled_values;
 
     long long bufferupsample = values[0].first;
     std::pair<double, double> tmp;
 
-    for (int i = 0; i < values.size(); ++i) {
+    for (long long i = 0; i < values.size(); ++i) {
         if (i != 0) {
             bufferupsample++;
         }
@@ -108,7 +95,7 @@ void AudioSignal::upsample(int L) {
         }
 
         // noi suy
-        for (int j = 1; j < L; ++j) {
+        for (long long j = 1; j < L; ++j) {
 
             bufferupsample++;
             upsampled_values.push_back({ bufferupsample, 0});
@@ -119,6 +106,7 @@ void AudioSignal::upsample(int L) {
 
     plot2();
 }
+
 void AudioSignal::writeWavFile() {
 
 
@@ -134,7 +122,7 @@ void AudioSignal::writeWavFile() {
     std::ofstream outFile(filename, std::ios::binary);
 
     if (!outFile.is_open()) {
-        std::cerr << "Không thể mở file để ghi dữ liệu." << std::endl;
+        std::cerr << "Cannot open file to write data." << std::endl;
         return;
     }
 
@@ -147,7 +135,7 @@ void AudioSignal::writeWavFile() {
 
     outFile.close();
 
-    std::cout << "File WAV '" << filename << "' đã được ghi thành công." << std::endl;
+    std::cout << "File WAV '" << filename << "' was recorded successfully." << std::endl;
 }
 
 void AudioSignal::plot1() const {
@@ -156,13 +144,13 @@ void AudioSignal::plot1() const {
     gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
     gp << "plot '-' with points pointtype 7 title 'Point', '-' with lines title 'Line'" << std::endl;
 
-    for (int i = 0; i < values.size(); i++) {
+    for (long long i = 0; i < values.size(); i++) {
 
         gp << values[i].first << " " << values[i].second << std::endl;
     }
     gp << "e" << std::endl;
 
-    for (int i = 0; i < values.size(); i++)
+    for (long long i = 0; i < values.size(); i++)
     {
         gp << values[i].first << " " << values[i].second << std::endl;
         gp << values[i].first << " 0" << std::endl;
@@ -183,7 +171,7 @@ void AudioSignal::plot2() const {
     gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
     gp << "plot '-' with lines title 'Line'" << std::endl;
 
-    for (int i = 0; i < values.size(); i++)
+    for (long long i = 0; i < values.size(); i++)
     {
         gp << values[i].second << std::endl;
     }
@@ -215,7 +203,7 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
     std::vector<std::pair<double, double>> result;
     
     if (this->rate != other.rate) {
-        std::cerr << "Chỉ có thể cộng hai tín hiệu cùng rate\n";
+        std::cerr << "You can only add two signals at the same rate\n";
         return AudioSignal(result, 0.0);
     }
 
@@ -250,7 +238,46 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
     return AudioSignal(result, rate);
 }
 
-AudioSignal AudioSignal::multiply(double constant) const {
+AudioSignal AudioSignal::operator*(const AudioSignal& other) const {
+    std::vector<std::pair<double, double>> result;
+
+    if (this->rate != other.rate) {
+        std::cerr << "You can only multiply two signals at the same rate\n";
+        return AudioSignal(result, 0.0);
+    }
+
+    long long i = 0, j = 0;
+
+    while (i < values.size() || j < other.values.size()) {
+        if (i < values.size() && j < other.values.size()) {
+            if (values[i].first == other.values[j].first) {
+                result.push_back({ values[i].first, values[i].second * other.values[j].second });
+                i++;
+                j++;
+            }
+            else if (values[i].first < other.values[j].first) {
+                result.push_back({ values[i].first, 0 });
+                i++;
+            }
+            else {
+                result.push_back({ other.values[j].first, 0 });
+                j++;
+            }
+        }
+        else if (i < values.size()) {
+            result.push_back({ values[i].first, 0 });
+            i++;
+        }
+        else {
+            result.push_back({ other.values[j].first, 0 });
+            j++;
+        }
+    }
+
+    return AudioSignal(result, rate);
+}
+
+AudioSignal AudioSignal::multiplyConstant(double constant) const {
     std::vector<std::pair<double, double>> result = this->values;
     for (long long i = 0; i < this->values.size(); i++) {
         result[i].second *= constant;

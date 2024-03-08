@@ -75,3 +75,7 @@ std::vector<std::pair<double, double>> Wav::toSignals() {
 
     return signals;
 }
+
+uint32_t Wav::getSampleRate() {
+    return header.sampleRate;
+}

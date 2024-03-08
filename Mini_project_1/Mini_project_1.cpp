@@ -13,8 +13,37 @@
 #include<sndfile.h>
 #include<sndfile.hh>
 
-bool openWavFile(std::string& filePath){
+AudioSignal audioSignal({}, 0);
+bool save = false;
 
+void saveSignal() {
+    char s = 'n';
+    std::cout << "Do you want to save this audio signal for the next operation?\n";
+    std::cout << "y(Yes) / n(No)\n";
+    std::cout << "select: ";
+    std::cin >> s;
+    if (s == 'y') {
+        save = true;
+    }
+    else {
+        save = false;
+    }
+}
+
+void saveFile() {
+    char s = '1';
+    std::cout << "Do you want to save this signal to file?\n";
+    std::cout << "y(Yes) / n(No)\n";
+    std::cout << "select: ";
+    std::cin >> s;
+    if (s == 'y') {
+        audioSignal.writeWavFile();
+    }
+}
+
+bool openWavFile(){
+
+    std::string filePath;
     char fileNameBuffer[MAX_PATH] = "";
 
     // Tạo một cấu trúc để chứa thông tin về loại file
@@ -37,27 +66,76 @@ bool openWavFile(std::string& filePath){
         // Nạp file .wav vào SoundBuffer
         if (!buffer.loadFromFile(filePath))
         {
-            std::cout << "Lỗi: Không thể mở file " << filePath << std::endl;
+            std::cout << "Error: Cannot open file " << filePath << std::endl;
             return false;
         }
+
+        Wav tmp_Wav(filePath);
+        audioSignal = AudioSignal(tmp_Wav.toSignals(), tmp_Wav.getSampleRate());
 
         return true;
     }
     else
     {
-        std::cout << "Hủy bỏ chọn file" << std::endl;
+        std::cout << "Cancel file selection" << std::endl;
         return false;
     }
 }
 
+void plot() {
+    char s = '1';
+    std::cout << "Do you want to graph this signal?\n";
+    std::cout << "y(Yes) / n(No)\n";
+    std::cout << "select: ";
+    std::cin >> s;
+    if (s == 'y') {
+        std::cout   << "draw type 1 chart (select 1)\n"
+                    << "draw type 2 chart (select 2) \n";
+        std::cout << "select: ";
+        std::cin >> s;
+        std::cin.get();
+        s == '1' ? audioSignal.plot1() : audioSignal.plot2();
+    }
+}
+
 void timeShifting() {
-    std::string filePath;
-    openWavFile(filePath);
-    std::cin.get();
-    Wav tmp_Wav(filePath);
-    AudioSignal tmp_AudioSignal(tmp_Wav.toSignals(), 44200);
-    tmp_AudioSignal.timeShift(1000);
-    tmp_AudioSignal.plot1();
+
+    if (!save) {
+        openWavFile();
+    }
+
+    long long pandemic;
+    std::cout << "Choose m = ";
+    std::cin >> pandemic;
+    audioSignal.timeShift(pandemic);
+
+    saveSignal();
+    plot();
+    saveFile();
+}
+
+void reversaling() {
+
+}
+
+void signalSum() {
+
+}
+
+void signalMultiply() {
+
+}
+
+void signalMultiplyConstant() {
+
+}
+
+void Downsampling() {
+
+}
+
+void Upsampling() {
+
 }
 
 int main()
@@ -82,6 +160,24 @@ int main()
         {
         case 1:
             timeShifting();
+            break;
+        case 2:
+            reversaling();
+            break;
+        case 3:
+            signalSum();
+            break;
+        case 4:
+            signalMultiply();
+            break;
+        case 5:
+            signalMultiplyConstant();
+            break;
+        case 6:
+            Downsampling();
+            break;
+        case 7:
+            Upsampling();
             break;
         case 8:
             flag = false;

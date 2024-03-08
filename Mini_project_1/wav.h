@@ -45,6 +45,7 @@ public:
 
     void printData();
     void playWav(std::string ref_Filename = "");
+    uint32_t getSampleRate();
 private:
     std::string filename;
     std::vector<double> data;
