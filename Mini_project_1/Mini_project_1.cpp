@@ -13,7 +13,9 @@
 #include<sndfile.h>
 #include<sndfile.hh>
 
-AudioSignal audioSignal({}, 0);
+AudioSignal audioSignal1({}, 0);
+AudioSignal audioSignal2({}, 0);
+std::map<std::string, AudioSignal> listAudioSignal;
 bool save = false;
 
 void saveSignal() {
@@ -37,11 +39,11 @@ void saveFile() {
     std::cout << "select: ";
     std::cin >> s;
     if (s == 'y') {
-        audioSignal.writeWavFile();
+        audioSignal1.writeWavFile();
     }
 }
 
-bool openWavFile(){
+bool openWavFile(AudioSignal& refAudioSignal){
 
     std::string filePath;
     char fileNameBuffer[MAX_PATH] = "";
@@ -71,7 +73,7 @@ bool openWavFile(){
         }
 
         Wav tmp_Wav(filePath);
-        audioSignal = AudioSignal(tmp_Wav.toSignals(), tmp_Wav.getSampleRate());
+        refAudioSignal = AudioSignal(tmp_Wav.toSignals(), tmp_Wav.getSampleRate());
 
         return true;
     }
@@ -94,48 +96,108 @@ void plot() {
         std::cout << "select: ";
         std::cin >> s;
         std::cin.get();
-        s == '1' ? audioSignal.plot1() : audioSignal.plot2();
+        s == '1' ? audioSignal1.plot1() : audioSignal1.plot2();
     }
 }
 
 void timeShifting() {
 
     if (!save) {
-        openWavFile();
+        openWavFile(audioSignal1);
     }
 
     long long pandemic;
     std::cout << "Choose m = ";
     std::cin >> pandemic;
-    audioSignal.timeShift(pandemic);
+    audioSignal1.timeShift(pandemic);
 
     saveSignal();
     plot();
-    saveFile();
 }
 
 void reversaling() {
 
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    audioSignal1.reverseTime();
+    saveSignal();
+    plot();
 }
 
 void signalSum() {
+    if (!save) {
+        std::cout << "Select signal file 1\n";
+        openWavFile(audioSignal1);
+    }
+    std::cout << "Select signal file 2\n";
+    openWavFile(audioSignal2);
 
+    audioSignal1 = audioSignal1 + audioSignal2;
+
+    saveSignal();
+    plot();
 }
 
 void signalMultiply() {
+    if (!save) {
+        std::cout << "Select signal file 1\n";
+        openWavFile(audioSignal1);
+    }
+    std::cout << "Select signal file 2\n";
+    openWavFile(audioSignal2);
 
+    audioSignal1 = audioSignal1 * audioSignal2;
+
+    saveSignal();
+    plot();
 }
 
 void signalMultiplyConstant() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
 
+    long long constant;
+    std::cout << "Choose constant = ";
+    std::cin >> constant;
+    audioSignal1.multiplyConstant(constant);
+
+    saveSignal();
+    plot();
 }
 
 void Downsampling() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
 
+    int M;
+    std::cout << "Choose M = ";
+    std::cin >> M;
+    audioSignal1.downsample(M);
+
+    saveSignal();
+    plot();
 }
 
 void Upsampling() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
 
+    int L;
+    std::cout << "Choose L = ";
+    std::cin >> L;
+    audioSignal1.upsample(L);
+
+    saveSignal();
+    plot();
+}
+
+void drawDiagram() {
+    openWavFile(audioSignal1);
+    plot();
 }
 
 int main()
@@ -151,7 +213,9 @@ int main()
         std::cout << "              5. Multiply the constant by the discrete signal\n";
         std::cout << "              6. Downsampling\n";
         std::cout << "              7. Upsampling\n";
-        std::cout << "              8. Quit\n";
+        std::cout << "              8. Draw diagram\n";
+        std::cout << "              9. Save file\n";
+        std::cout << "              0. Quit\n";
         std::cout << "__________________________________________________________\n";
         std::cout << "Select: ";
         std::cin >> select;
@@ -180,6 +244,12 @@ int main()
             Upsampling();
             break;
         case 8:
+            drawDiagram();
+            break;
+        case 9:
+            saveFile();
+            break;
+        case 0:
             flag = false;
             break;
         }

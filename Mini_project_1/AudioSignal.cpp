@@ -57,6 +57,8 @@ void AudioSignal::reverseTime() {
     }
 
     values = reversed_values;
+
+    std::cout << "Reverse Time success!\n";
 }
 
 void AudioSignal::downsample(int M)
@@ -74,6 +76,7 @@ void AudioSignal::downsample(int M)
         downsampled_values.push_back(tmp);
     }
     values = downsampled_values;
+    std::cout << "Downsample success!\n";
 }
 
 void AudioSignal::upsample(int L) {
@@ -104,7 +107,7 @@ void AudioSignal::upsample(int L) {
 
     values = upsampled_values;
 
-    plot2();
+    std::cout << "Upsample success!\n";
 }
 
 void AudioSignal::writeWavFile() {
@@ -235,6 +238,7 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
         }
     }
 
+    std::cout << "The calculation is completed!\n";
     return AudioSignal(result, rate);
 }
 
@@ -273,7 +277,7 @@ AudioSignal AudioSignal::operator*(const AudioSignal& other) const {
             j++;
         }
     }
-
+    std::cout << "The calculation is completed!\n";
     return AudioSignal(result, rate);
 }
 
@@ -282,5 +286,6 @@ AudioSignal AudioSignal::multiplyConstant(double constant) const {
     for (long long i = 0; i < this->values.size(); i++) {
         result[i].second *= constant;
     }
+    std::cout << "The calculation is completed!\n";
     return AudioSignal(result, rate);
 }
