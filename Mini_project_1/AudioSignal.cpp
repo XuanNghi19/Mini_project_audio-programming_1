@@ -1,7 +1,10 @@
-﻿#include<ios>
-#include<iostream>
-#include<vector>
-#include<numeric>
+﻿#include <ios>
+#include <iostream>
+#include <vector>
+#include <utility>
+#include <cstdio>
+#include <numeric>
+#include <stdio.h>
 #include "AudioSignal.h"
 #include "gnuplot-iostream.h"
 #include "wav.h"
@@ -171,30 +174,62 @@ void AudioSignal::writeWavFile(WavHeader refWavHeader) {
     std::cout << "File WAV '" << filename << "' was recorded successfully." << std::endl;
 }
 
+//void AudioSignal::plot1() const {
+//    Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
+//    
+//    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
+//    gp << "plot '-' with points pointtype 7 title 'Point', '-' with lines title 'Line'" << std::endl;
+//
+//    for (long long i = 0; i < values.size(); i++) {
+//
+//        gp << values[i].first << " " << values[i].second << std::endl;
+//    }
+//    gp << "e" << std::endl;
+//
+//    for (long long i = 0; i < values.size(); i++)
+//    {
+//        gp << values[i].first << " " << values[i].second << std::endl;
+//        gp << values[i].first << " 0" << std::endl;
+//        gp << std::endl;
+//    }
+//
+//    gp << "e" << std::endl;
+//
+//
+//    std::cout << "Press enter to out!";
+//    std::cin.get();
+//}
+
+#include <iostream>
+#include <vector>
+#include <utility>
+#include <process.h>
+
 void AudioSignal::plot1() const {
-    Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
-    
-    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
-    gp << "plot '-' with points pointtype 7 title 'Point', '-' with lines title 'Line'" << std::endl;
+    std::vector<char> cmdline;
+    cmdline.reserve(256);
+    cmdline.push_back('"');
+    cmdline.insert(cmdline.end(), "C:\\Program Files\\gnuplot\\bin\\gnuplot.exe", "C:\\Program Files\\gnuplot\\bin\\gnuplot.exe" + strlen("C:\\Program Files\\gnuplot\\bin\\gnuplot.exe"));
+    cmdline.push_back('"');
+    cmdline.push_back(' ');
+    cmdline.insert(cmdline.end(), "-persist", "-persist" + strlen("-persist"));
+    cmdline.push_back('\0');
 
-    for (long long i = 0; i < values.size(); i++) {
-
-        gp << values[i].first << " " << values[i].second << std::endl;
-    }
-    gp << "e" << std::endl;
-
-    for (long long i = 0; i < values.size(); i++)
-    {
-        gp << values[i].first << " " << values[i].second << std::endl;
-        gp << values[i].first << " 0" << std::endl;
-        gp << std::endl;
+    FILE* gnuplot_pipe = _popen(&cmdline[0], "wb");
+    if (!gnuplot_pipe) {
+        std::cerr << "Error opening Gnuplot pipe" << std::endl;
+        return;
     }
 
-    gp << "e" << std::endl;
+    fprintf(gnuplot_pipe, "set xlabel 'n'\nset ylabel 'x(n)'\n");
+    fprintf(gnuplot_pipe, "plot '-' binary%lu%lu%lu%lu ", sizeof(double), sizeof(double), 2 * sizeof(double), values.size());
 
+    fwrite(&values[0], sizeof(std::pair<double, double>), values.size(), gnuplot_pipe);
+    fprintf(gnuplot_pipe, "e\n");
 
-    std::cout << "Press enter to out!";
+    std::cout << "Press enter to exit!";
     std::cin.get();
+    _pclose(gnuplot_pipe);
 }
 
 void AudioSignal::plot2() const {
