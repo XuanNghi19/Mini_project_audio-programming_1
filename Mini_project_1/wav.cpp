@@ -33,6 +33,8 @@ Wav::Wav(const std::string& filename) : filename(filename) {
     }
 }
 
+Wav::Wav() {}
+
 void Wav::playWav(std::string ref_Filename) {
     
     sf::SoundBuffer sb;
@@ -78,4 +80,8 @@ std::vector<std::pair<double, double>> Wav::toSignals() {
 
 uint32_t Wav::getSampleRate() {
     return header.sampleRate;
+}
+
+WavHeader Wav::getWavHeader() {
+    return header;
 }

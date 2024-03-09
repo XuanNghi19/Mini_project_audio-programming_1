@@ -15,7 +15,7 @@
 
 AudioSignal audioSignal1({}, 0);
 AudioSignal audioSignal2({}, 0);
-std::map<std::string, AudioSignal> listAudioSignal;
+Wav wav;
 bool save = false;
 
 void saveSignal() {
@@ -29,17 +29,6 @@ void saveSignal() {
     }
     else {
         save = false;
-    }
-}
-
-void saveFile() {
-    char s = '1';
-    std::cout << "Do you want to save this signal to file?\n";
-    std::cout << "y(Yes) / n(No)\n";
-    std::cout << "select: ";
-    std::cin >> s;
-    if (s == 'y') {
-        audioSignal1.writeWavFile();
     }
 }
 
@@ -72,8 +61,8 @@ bool openWavFile(AudioSignal& refAudioSignal){
             return false;
         }
 
-        Wav tmp_Wav(filePath);
-        refAudioSignal = AudioSignal(tmp_Wav.toSignals(), tmp_Wav.getSampleRate());
+        wav = Wav(filePath);
+        refAudioSignal = AudioSignal(wav.toSignals(), wav.getSampleRate());
 
         return true;
     }
@@ -161,7 +150,7 @@ void signalMultiplyConstant() {
     long long constant;
     std::cout << "Choose constant = ";
     std::cin >> constant;
-    audioSignal1.multiplyConstant(constant);
+    audioSignal1 = audioSignal1.multiplyConstant(constant);
 
     saveSignal();
     plot();
@@ -200,6 +189,11 @@ void drawDiagram() {
     plot();
 }
 
+void playSound() {
+    openWavFile(audioSignal2);
+    wav.playWav();
+}
+
 int main()
 {  
     bool flag = true;
@@ -215,6 +209,7 @@ int main()
         std::cout << "              7. Upsampling\n";
         std::cout << "              8. Draw diagram\n";
         std::cout << "              9. Save file\n";
+        std::cout << "              10.Play sound\n";
         std::cout << "              0. Quit\n";
         std::cout << "__________________________________________________________\n";
         std::cout << "Select: ";
@@ -247,7 +242,10 @@ int main()
             drawDiagram();
             break;
         case 9:
-            saveFile();
+            audioSignal1.writeWavFile(wav.getWavHeader());
+            break;
+        case 10:
+            playSound();
             break;
         case 0:
             flag = false;

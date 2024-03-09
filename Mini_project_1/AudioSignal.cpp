@@ -1,4 +1,6 @@
-﻿#include<vector>
+﻿#include<ios>
+#include<iostream>
+#include<vector>
 #include<numeric>
 #include "AudioSignal.h"
 #include "gnuplot-iostream.h"
@@ -48,10 +50,8 @@ void AudioSignal::timeShift(long long pandemic) {
 }
 
 void AudioSignal::reverseTime() {
-    // Tạo một bản sao của vector giá trị âm thanh
     std::vector<std::pair<double, double>> reversed_values = values;
-
-    // Đảo ngược chỉ số thời gian
+    std::reverse(reversed_values.begin(), reversed_values.end());
     for (long long i = 0; i < reversed_values.size(); ++i) {
         reversed_values[i].first = -reversed_values[i].first;
     }
@@ -110,18 +110,23 @@ void AudioSignal::upsample(int L) {
     std::cout << "Upsample success!\n";
 }
 
-void AudioSignal::writeWavFile() {
+void writeToFile(std::ofstream &file, int value, int size) {
+    file.write(reinterpret_cast<const char*> (&value), size);
+}
 
+void AudioSignal::writeWavFile(WavHeader refWavHeader) {
 
-    uint16_t channels = 1; // mono
-    uint32_t rate = this->rate; // Hz
-    uint16_t bitsPerSample = 16; // bits/sample
-    uint32_t dataSize = values.size() * channels * bitsPerSample / 8; // kích thước dữ liệu âm thanh
-    WavHeader header(channels, rate, bitsPerSample, dataSize);
+    if (values == std::vector<std::pair<double, double>>{}) {
+        std::cout << "You have no data to save!\n";
+        return;
+    }
 
-    // Tên file đầu ra
-    std::string filename = "../assets/output.wav";
-    // Mở một file để ghi dữ liệu âm thanh vào
+    std::cin.get();
+    std::cout << "Enter the audio file name: ";
+    std::string name;
+    std::getline(std::cin, name);
+    std::string filename = "../assets/" + name + ".wav";
+
     std::ofstream outFile(filename, std::ios::binary);
 
     if (!outFile.is_open()) {
@@ -129,12 +134,37 @@ void AudioSignal::writeWavFile() {
         return;
     }
 
-    outFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+    //Header chunk
+    outFile << "RIFF";
+    outFile << "----";
+    outFile << "WAVE";
+
+    //Format chunk
+    outFile << "fmt ";
+    writeToFile(outFile, 16, 4); //Length of format data as listed above
+    writeToFile(outFile, 1, 2); //Type of format (1 is PCM) - 2 byte integer
+    writeToFile(outFile, refWavHeader.numChannels, 2); //Number of Channels - 2 byte integer
+    writeToFile(outFile, rate, 4); //Sample Rate - 32 byte integer
+    writeToFile(outFile, (rate * refWavHeader.bitsPerSample * refWavHeader.numChannels) / 8, 4); //Byte rate
+    writeToFile(outFile, (refWavHeader.bitsPerSample * refWavHeader.numChannels) / 8, 2); //Block align (bytes/sample)
+    writeToFile(outFile, refWavHeader.bitsPerSample, 2); //Bits per sample
+
+    //Date chunk
+    outFile << "data";
+    outFile << "----";
+    int preAudioPosition = outFile.tellp();
 
     for (const auto& sample : values) {
         int16_t sampleValue = static_cast<int16_t>(sample.second);
-        outFile.write(reinterpret_cast<const char*>(&sampleValue), sizeof(sampleValue));
+        writeToFile(outFile, sampleValue, 2);
     }
+
+    int posAudioPosition = outFile.tellp();
+    outFile.seekp(preAudioPosition - 4);
+    writeToFile(outFile, posAudioPosition - preAudioPosition, 4);
+
+    outFile.seekp(4, std::ios::beg);
+    writeToFile(outFile, posAudioPosition - 8, 4);
 
     outFile.close();
 
