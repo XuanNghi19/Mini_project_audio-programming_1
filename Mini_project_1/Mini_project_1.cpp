@@ -190,8 +190,8 @@ void drawDiagram() {
 }
 
 void playSound() {
-    openWavFile(audioSignal2);
-    wav.playWav();
+    openWavFile(audioSignal1);
+    wav.playWav("");
 }
 
 int main()
@@ -209,7 +209,7 @@ int main()
         std::cout << "              7. Upsampling\n";
         std::cout << "              8. Draw diagram\n";
         std::cout << "              9. Save file\n";
-        std::cout << "              10.Play sound\n";
+        //std::cout << "              10.Play sound\n";
         std::cout << "              0. Quit\n";
         std::cout << "__________________________________________________________\n";
         std::cout << "Select: ";
@@ -244,9 +244,9 @@ int main()
         case 9:
             audioSignal1.writeWavFile(wav.getWavHeader());
             break;
-        case 10:
-            playSound();
-            break;
+        //case 10:
+        //    playSound();
+        //    break;
         case 0:
             flag = false;
             break;
