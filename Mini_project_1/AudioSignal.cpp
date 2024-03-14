@@ -271,7 +271,6 @@ AudioSignal AudioSignal::operator+(const AudioSignal& other) const {
         }
     }
 
-    std::cout << "The calculation is completed!\n";
     return AudioSignal(result, rate);
 }
 
@@ -283,34 +282,29 @@ AudioSignal AudioSignal::operator*(const AudioSignal& other) const {
         return AudioSignal(result, 0.0);
     }
 
-    long long i = 0, j = 0;
+    AudioSignal x_AudioSignal(values, rate);
+    std::vector<std::pair<double, double>> x = x_AudioSignal.getValues();
+    AudioSignal h_AudioSignal = other;
+    std::vector<std::pair<double, double>> h = h_AudioSignal.getValues();
+    
+    long long n = 0, k = 0, N = x.size(), M = h.size(), i = 0;
+    
+    std::vector<double> y(N + M - 1);
+    result.resize( N + M - 1);
 
-    while (i < values.size() || j < other.values.size()) {
-        if (i < values.size() && j < other.values.size()) {
-            if (values[i].first == other.values[j].first) {
-                result.push_back({ values[i].first, values[i].second * other.values[j].second });
-                i++;
-                j++;
+    for (n = 0; n < N + M - 1; n++) {
+        for (k = 0; k <= std::min(n, M - 1); k++) {
+            if (n - k < N && k < M) {
+                y[n] += x[n - k].second * h[k].second;
             }
-            else if (values[i].first < other.values[j].first) {
-                result.push_back({ values[i].first, 0 });
-                i++;
-            }
-            else {
-                result.push_back({ other.values[j].first, 0 });
-                j++;
-            }
-        }
-        else if (i < values.size()) {
-            result.push_back({ values[i].first, 0 });
-            i++;
-        }
-        else {
-            result.push_back({ other.values[j].first, 0 });
-            j++;
         }
     }
-    std::cout << "The calculation is completed!\n";
+
+    for (auto tmp : y) {
+        result[i].first = i;
+        result[i].second = tmp;
+        ++i;
+    }
     return AudioSignal(result, rate);
 }
 

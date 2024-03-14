@@ -203,7 +203,7 @@ int main()
         std::cout << "              1. Time shifting\n";
         std::cout << "              2. Time reversal\n";
         std::cout << "              3. Sum two discrete signals\n";
-        std::cout << "              4. Multiply two discrete signals\n";
+        std::cout << "              4. Signal convolution\n";
         std::cout << "              5. Multiply the constant by the discrete signal\n";
         std::cout << "              6. Downsampling\n";
         std::cout << "              7. Upsampling\n";
