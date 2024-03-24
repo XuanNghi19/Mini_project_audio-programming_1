@@ -21,6 +21,10 @@ public:
 	AudioSignal operator+(const AudioSignal& other) const;
 	AudioSignal operator*(const AudioSignal& other) const;
 	AudioSignal multiplyConstant(double constant) const;
+	static void LPF(AudioSignal& refAudioSignal, double fc, double fs, int N);
+	static void HPF(AudioSignal& refAudioSignal, double fc, double fs, int N);
+	static void BPF(AudioSignal& refAudioSignal, double fc1, double fc2, double fs, int N);
+	static void BSF(AudioSignal& refAudioSignal, double fc1, double fc2, double fs, int N);
 private:
 	std::vector<std::pair<double, double>> values = {};
 	uint32_t rate = 0;

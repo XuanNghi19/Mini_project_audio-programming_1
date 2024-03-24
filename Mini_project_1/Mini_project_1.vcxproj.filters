@@ -40,10 +40,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\assets\test.wav">
+    <Media Include="..\assets\together_alone.wav">
       <Filter>assets</Filter>
     </Media>
-    <Media Include="..\assets\together_alone.wav">
+    <Media Include="..\assets\test1.wav">
+      <Filter>assets</Filter>
+    </Media>
+    <Media Include="..\assets\test2.wav">
       <Filter>assets</Filter>
     </Media>
   </ItemGroup>
