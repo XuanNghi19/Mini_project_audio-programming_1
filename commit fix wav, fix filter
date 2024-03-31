@@ -1,0 +1,31 @@
+[33m9ca9b73[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33mfb6e5a1[m HEAD@{1}: reset: moving to HEAD^1
+[33m6198242[m HEAD@{2}: reset: moving to HEAD
+[33m6198242[m HEAD@{3}: commit: fix wav, fix filter
+[33mfb6e5a1[m HEAD@{4}: commit: fix wav, fix filter
+[33m9ca9b73[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{5}: commit: filter
+[33macf7860[m HEAD@{6}: commit: Convolution
+[33mfb9c98b[m HEAD@{7}: commit: fix plot, turn off play sound
+[33m41c4618[m HEAD@{8}: commit: change assets
+[33ma0a2113[m HEAD@{9}: commit: Optimize file saving
+[33m9694fc7[m HEAD@{10}: commit: menu2
+[33me203885[m HEAD@{11}: commit: menu1
+[33m2fc94e2[m[33m ([m[1;31morigin/thanhminh[m[33m, [m[1;32mthanhminh[m[33m)[m HEAD@{12}: merge thanhminh: Fast-forward
+[33m45d31f0[m HEAD@{13}: checkout: moving from thanhminh to master
+[33m2fc94e2[m[33m ([m[1;31morigin/thanhminh[m[33m, [m[1;32mthanhminh[m[33m)[m HEAD@{14}: commit: plot1
+[33m0dc16c1[m HEAD@{15}: checkout: moving from master to thanhminh
+[33m45d31f0[m HEAD@{16}: checkout: moving from thanhminh to master
+[33m0dc16c1[m HEAD@{17}: commit (merge): merge
+[33m45d31f0[m HEAD@{18}: checkout: moving from master to thanhminh
+[33m45d31f0[m HEAD@{19}: checkout: moving from thanhminh to master
+[33m9487650[m HEAD@{20}: reset: moving to HEAD
+[33m9487650[m HEAD@{21}: reset: moving to HEAD
+[33m9487650[m HEAD@{22}: reset: moving to HEAD
+[33m9487650[m HEAD@{23}: checkout: moving from master to thanhminh
+[33m45d31f0[m HEAD@{24}: commit: ???
+[33md3a18a4[m HEAD@{25}: commit: lan 2
+[33m9487650[m HEAD@{26}: checkout: moving from thanhminh to master
+[33m9487650[m HEAD@{27}: checkout: moving from master to thanhminh
+[33m9487650[m HEAD@{28}: commit: tich tong
+[33mea0cf61[m HEAD@{29}: commit: Add project files.
+[33m040cb5f[m HEAD@{30}: commit (initial): Add .gitattributes and .gitignore.
