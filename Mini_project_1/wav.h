@@ -40,12 +40,14 @@ class Wav
 {
 public:
     Wav(const std::string& filename);
+    Wav();
 
     std::vector<std::pair<double, double>> toSignals();
 
     void printData();
     void playWav(std::string ref_Filename = "");
-    std::string changeRate(int rate);
+    uint32_t getSampleRate();
+    WavHeader getWavHeader();
 private:
     std::string filename;
     std::vector<double> data;

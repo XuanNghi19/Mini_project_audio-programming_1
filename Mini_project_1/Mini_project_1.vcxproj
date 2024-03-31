@@ -133,12 +133,16 @@
   <ItemGroup>
     <ClCompile Include="AudioSignal.cpp" />
     <ClCompile Include="Mini_project_1.cpp" />
-    <ClCompile Include="wav.cpp" />
+    <ClCompile Include="Wav.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioSignal.h" />
     <ClInclude Include="gnuplot-iostream.h" />
-    <ClInclude Include="wav.h" />
+    <ClInclude Include="Wav.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\assets\test.wav" />
+    <Media Include="..\assets\together_alone.wav" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\assets\test.wav" />

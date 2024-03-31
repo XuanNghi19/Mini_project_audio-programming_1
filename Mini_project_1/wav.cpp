@@ -19,7 +19,6 @@ Wav::Wav(const std::string& filename) : filename(filename) {
 
     std::cout << "sampleRate    : " << header.sampleRate << std::endl;
 
-
     if (header.bitsPerSample != 16) {
         std::cerr << "Error: Only 16-bit audio is supported." << std::endl;
         return;
@@ -34,9 +33,10 @@ Wav::Wav(const std::string& filename) : filename(filename) {
     }
 }
 
+Wav::Wav() {}
 
 void Wav::playWav(std::string ref_Filename) {
-
+    
     sf::SoundBuffer sb;
     std::cout << "Load file...................\n";
     if (!sb.loadFromFile(ref_Filename == "" ? this->filename : ref_Filename)) {
@@ -56,54 +56,10 @@ void Wav::playWav(std::string ref_Filename) {
             break;
         }
     }
-
+    
     return;
 }
-
-//std::string Wav::changeRate(int rate) {
-//    const std::string changeRate_FileSound = "../assets/changeRate_" + filename;
-//    const std::string inputFile = this->filename;
-//
-//    SndfileHandle inputHandle, outputHandle;
-//
-//    // Mở tệp đầu vào
-//    if (!(inputHandle = SndfileHandle(inputFile.c_str(), SFM_READ, nullptr))) {
-//        std::cerr << "Failed to open input file: " << inputFile << std::endl;
-//        return "";
-//    }
-//    
-//    // Lấy thông tin về tệp đầu vào
-//    SF_INFO inputInfo;
-//    inputHandle.command(SFC_GET_SIGNAL_INFO, &inputInfo, sizeof(SF_INFO));
-//
-//    // Thiết lập tham số cho tệp đầu ra
-//    SF_INFO outputInfo = inputInfo;
-//    outputInfo.frames = static_cast<sf_count_t>(inputInfo.frames * inputInfo.samplerate / newRate);
-//    outputInfo.samplerate = newRate;
-//
-//    // Tạo tệp đầu ra
-//    if (!(outputHandle = SndfileHandle(outputFile.c_str(), SFM_WRITE, &outputInfo, nullptr))) {
-//        std::cerr << "Failed to create output file: " << outputFile << std::endl;
-//        return "";
-//    }
-//
-//    // Đọc dữ liệu từ tệp đầu vào và ghi vào tệp đầu ra với tốc độ mới
-//    static const size_t BUFFER_SIZE = 4096;
-//    float buffer[BUFFER_SIZE];
-//    sf_count_t framesRead, framesWritten;
-//
-//    while ((framesRead = inputHandle.read(buffer, BUFFER_SIZE)) > 0) {
-//        framesWritten = outputHandle.write(buffer, framesRead);
-//        if (framesWritten != framesRead) {
-//            std::cerr << "Error writing to output file" << std::endl;
-//            return "";
-//        }
-//    }
-//
-//
-//    return changeRate_FileSound;
-//}
-
+    
 void Wav::printData() {
     for (auto x : data) {
         std::cout << x << " ";
@@ -120,4 +76,12 @@ std::vector<std::pair<double, double>> Wav::toSignals() {
     }
 
     return signals;
+}
+
+uint32_t Wav::getSampleRate() {
+    return header.sampleRate;
+}
+
+WavHeader Wav::getWavHeader() {
+    return header;
 }

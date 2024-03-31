@@ -24,7 +24,7 @@
     <ClCompile Include="AudioSignal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wav.cpp">
+    <ClCompile Include="Wav.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,12 +35,15 @@
     <ClInclude Include="AudioSignal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wav.h">
+    <ClInclude Include="Wav.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\assets\test.wav">
+      <Filter>assets</Filter>
+    </Media>
+    <Media Include="..\assets\together_alone.wav">
       <Filter>assets</Filter>
     </Media>
   </ItemGroup>
