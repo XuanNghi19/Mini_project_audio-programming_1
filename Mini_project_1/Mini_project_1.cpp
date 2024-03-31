@@ -139,6 +139,37 @@ void signalMultiply() {
 
     audioSignal1 = audioSignal1 * audioSignal2;
 
+    // Hiển thị hộp thoại chọn file
+    if (GetOpenFileNameA(&ofn))
+    {
+        filePath = fileNameBuffer;
+        sf::SoundBuffer buffer;
+
+        // Nạp file .wav vào SoundBuffer
+        if (!buffer.loadFromFile(filePath))
+        {
+            std::cout << "Lỗi: Không thể mở file " << filePath << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+    else
+    {
+        std::cout << "Hủy bỏ chọn file" << std::endl;
+        return false;
+    }
+}
+
+void timeShifting() {
+    std::string filePath;
+    openWavFile(filePath);
+    std::cin.get();
+    Wav tmp_Wav(filePath);
+    AudioSignal tmp_AudioSignal(tmp_Wav.toSignals(), 44200);
+    tmp_AudioSignal.timeShift(1000);
+    tmp_AudioSignal.plot1();
+}
     saveSignal();
     plot();
 }
