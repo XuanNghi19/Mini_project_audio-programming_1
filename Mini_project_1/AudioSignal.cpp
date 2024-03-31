@@ -1,4 +1,6 @@
-﻿#include <ios>
+﻿#define _USE_MATH_DEFINES
+#include <cmath>
+#include <ios>
 #include <iostream>
 #include <vector>
 #include <utility>
@@ -35,7 +37,7 @@ void AudioSignal::timeShift(long long pandemic) {
     else if (pandemic > 0) {
         for (long long i = shifted_values.size() - 1; i >= 0; i--)
         {
-            if (i > pandemic) {
+            if (i >= pandemic + 1 ) {
                 shifted_values[i].first = values[i - pandemic].first + pandemic;
                 shifted_values[i].second = values[i - pandemic].second;
             }
@@ -137,6 +139,8 @@ void AudioSignal::writeWavFile(WavHeader refWavHeader) {
         return;
     }
 
+    std::cout << refWavHeader.numChannels << std::endl;
+    std::cout << refWavHeader.bitsPerSample << std::endl;
     //Header chunk
     outFile << "RIFF";
     outFile << "----";
@@ -177,7 +181,7 @@ void AudioSignal::writeWavFile(WavHeader refWavHeader) {
 void AudioSignal::plot1() const {
     Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
     
-    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
+    gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";  
     gp << "plot '-' with points pointtype 7 title 'Point', '-' with lines title 'Line'" << std::endl;
 
     for (long long i = 0; i < values.size(); i++) {
@@ -205,7 +209,8 @@ void AudioSignal::plot2() const {
     Gnuplot gp("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\"");
 
     gp << "set xlabel 'n'\nset ylabel 'x(n)'\n";
-    gp << "plot '-' with lines title 'Line'" << std::endl;
+    gp << "set style line 1 lc rgb 'blue' pt 7\n";
+    gp << "plot '-' with lines ls 1 title 'Line'" << std::endl;
 
     for (long long i = 0; i < values.size(); i++)
     {
@@ -315,4 +320,99 @@ AudioSignal AudioSignal::multiplyConstant(double constant) const {
     }
     std::cout << "The calculation is completed!\n";
     return AudioSignal(result, rate);
+}
+
+void AudioSignal::LPF(AudioSignal &refAudioSignal, double fc, double fs, int N) {
+    std::vector<std::pair<double, double>> h;
+    h.resize(N);
+    double omegac = (2 * M_PI * fc) / fs;
+
+    for (int n = 0; n < N; n++) {
+        h[n].first = n;
+
+        double x = omegac * (n - (N - 1) / 2.0);
+
+        if (x == 0) {
+            h[n].second = omegac / M_PI;
+        }
+        else {
+            h[n].second = (omegac / M_PI) * (sin(x) / x);
+        }
+    }
+
+    AudioSignal filter(h, fs);
+    refAudioSignal = refAudioSignal * filter;
+}
+
+void AudioSignal::HPF(AudioSignal &refAudioSignal, double fc, double fs, int N) {
+    std::vector<std::pair<double, double>> h;
+    h.resize(N);
+    double omegac = (2 * M_PI * fc) / fs;
+
+    for (int n = 0; n < N; n++) {
+        h[n].first = n;
+
+        double x = omegac * (n - (N - 1) / 2.0);
+
+        if (x == 0) {
+            h[n].second = 1 - omegac / M_PI;
+        }
+        else {
+            h[n].second = -(omegac / M_PI) * (sin(x) / x);
+        }
+    }
+
+    AudioSignal filter(h, fs);
+    refAudioSignal = refAudioSignal * filter;
+}
+
+void AudioSignal::BPF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N) {
+    std::vector<std::pair<double, double>> h;
+    h.resize(N);
+    double omegac1 = (2 * M_PI * fc1) / fs; // tần số thấp
+    double omegac2 = (2 * M_PI * fc2) / fs; // tần số cao
+
+    for (int n = 0; n < N; n++) {
+        h[n].first = n; 
+
+        double x = (n - (N - 1) / 2.0);
+
+        double sinc1 = (omegac1 * x == 0) ? 1 : sin(omegac1 * x) / (omegac1 * x);
+        double sinc2 = (omegac2 * x == 0) ? 1 : sin(omegac2 * x) / (omegac2 * x);
+
+        h[n].second = ((omegac2 / M_PI) * sinc2) - ((omegac1 / M_PI) * sinc1);
+
+    }
+
+    AudioSignal filter(h, fs);
+    refAudioSignal = refAudioSignal * filter;
+}
+
+void AudioSignal::BSF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N) {
+    std::vector<std::pair<double, double>> h;
+    h.resize(N);
+    double omegac1 = (2 * M_PI * fc1) / fs; // tần số thấp
+    double omegac2 = (2 * M_PI * fc2) / fs; // tần số cao
+
+    for (int n = 0; n < N; n++) {
+        h[n].first = n;
+
+        double x = (n - (N - 1) / 2.0);
+
+        double sinc1 = (omegac1 * x == 0) ? 1 : sin(omegac1 * x) / (omegac1 * x);
+        double sinc2 = (omegac2 * x == 0) ? 1 : sin(omegac2 * x) / (omegac2 * x);
+
+        if (x == 0) {
+            h[n].second = 1 - (
+                ((omegac2 / M_PI) * sinc2) - ((omegac1 / M_PI) * sinc1)
+                );
+        }
+        else {
+            h[n].second = -(((omegac2 / M_PI) * sinc2) - ((omegac1 / M_PI) * sinc1));
+        }
+
+    }
+
+    AudioSignal filter(h, fs);
+    refAudioSignal = refAudioSignal * filter;
 }

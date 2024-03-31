@@ -7,30 +7,53 @@
 #include<sndfile.h>
 #include"gnuplot-iostream.h"
 
-
 Wav::Wav(const std::string& filename) : filename(filename) {
     std::ifstream file(filename, std::ios::binary);
+
     if (!file) {
         std::cerr << "Error: Couldn't open file: " << filename << std::endl;
         return;
     }
 
-    file.read(reinterpret_cast<char*>(&header), sizeof(header));
+    file.read(reinterpret_cast<char*>(&header), sizeof(WavHeader));
 
-    std::cout << "sampleRate    : " << header.sampleRate << std::endl;
+    // Kiểm tra header
+    if (std::string(header.chunkId, 4) != "RIFF" ||
+        std::string(header.format, 4) != "WAVE" ||
+        std::string(header.subchunk1Id, 4) != "fmt " ||
+        std::string(header.subchunk2Id, 4) != "data") {
+        std::cerr << "Error: Invalid WAV file format." << std::endl;
+        return;
+    }
 
     if (header.bitsPerSample != 16) {
         std::cerr << "Error: Only 16-bit audio is supported." << std::endl;
         return;
     }
 
-    uint32_t numSamples = header.subchunk2Size / (header.bitsPerSample / 8);
+    uint32_t dataSize = header.subchunk2Size;
+    uint32_t numSamples = dataSize / (header.bitsPerSample / 8);
     this->data.reserve(numSamples);
 
+    uint32_t dataStartOffset = sizeof(WavHeader);
+    std::cout << "Num of channels: " << header.numChannels << std::endl;
+    std::cout << "bitsPerSample: " << header.bitsPerSample << std::endl;
+
+    uint32_t dataRead = 0;
     int16_t sample;
-    while (file.read(reinterpret_cast<char*>(&sample), sizeof(int16_t))) {
+    file.seekg(dataStartOffset, std::ios::beg);
+
+    while (dataRead < dataSize) {
+        file.read(reinterpret_cast<char*>(&sample), sizeof(int16_t));
         this->data.push_back(static_cast<double>(sample));
+        dataRead += sizeof(int16_t);
     }
+
+    if (file.peek() != std::char_traits<char>::eof()) {
+        file.ignore(std::numeric_limits<std::streamsize>::max());
+    }
+
+    file.close();
 }
 
 Wav::Wav() {}

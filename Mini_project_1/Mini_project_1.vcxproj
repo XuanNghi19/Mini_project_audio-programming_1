@@ -141,11 +141,9 @@
     <ClInclude Include="Wav.h" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="..\assets\test.wav" />
+    <Media Include="..\assets\test1.wav" />
+    <Media Include="..\assets\test2.wav" />
     <Media Include="..\assets\together_alone.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\assets\test.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
