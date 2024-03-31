@@ -12,6 +12,7 @@
 #include<Windows.h>
 #include<sndfile.h>
 #include<sndfile.hh>
+#include <chrono>
 
 AudioSignal audioSignal1({}, 0);
 AudioSignal audioSignal2({}, 0);
@@ -57,7 +58,7 @@ bool openWavFile(AudioSignal& refAudioSignal){
         // Nạp file .wav vào SoundBuffer
         if (!buffer.loadFromFile(filePath))
         {
-            std::cout << "Error: Cannot open file " << filePath << std::endl;
+            std::cout << "Lỗi: Không thể mở file " << filePath << std::endl;
             return false;
         }
 
@@ -271,6 +272,15 @@ void filter() {
 
     saveSignal();
     plot();
+}
+
+void echo() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    audioSignal1.applyReverb(0.5,1,50,1,0.88);
+
+    saveSignal();
 }
 
 int main()

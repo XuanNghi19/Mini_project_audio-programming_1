@@ -10,12 +10,80 @@
 #include "AudioSignal.h"
 #include "gnuplot-iostream.h"
 #include "wav.h"
+#include <chrono>
 
 AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double rate)
 {
     this->values = values;
     this->rate = rate;
 }
+
+//void AudioSignal::reverb( int delayMilliseconds, float decay) {
+//    //int delayMilliseconds = 500; // half a second
+//    int delaySamples =
+//        (int)((float)delayMilliseconds * 44.1f); // assumes 44100 Hz sample rate
+//    /*float decay = 0.5f;*/
+//    for (int i = 0; i < values.size() - delaySamples; i++)
+//    {
+//        // WARNING: overflow potential
+//        values[i + delaySamples] += (short)((float)values[i] * decay);
+//    }
+//}
+void AudioSignal::applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance) {
+    int delayInSamples = static_cast<int>(delayInMs * rate / 1000.0);
+    std::vector<std::pair<double, double>> reverbBuffer(delayInSamples, { 0.0, 0.0 });
+
+    for (int i = 0; i < values.size(); ++i) {
+        // Calculate reverb by mixing delayed samples with original samples
+        values[i].first = (1.0 - wet) * values[i].first + wet * (values[i].first + mix * reverbBuffer[i % delayInSamples].first);
+        values[i].second = (1.0 - wet) * values[i].second + wet * (values[i].second + mix * reverbBuffer[i % delayInSamples].second);
+
+        // Update reverb buffer with decay
+        reverbBuffer[i % delayInSamples].first = (1.0 - reverberance) * values[i].first * decay + reverberance * reverbBuffer[i % delayInSamples].first;
+        reverbBuffer[i % delayInSamples].second = (1.0 - reverberance) * values[i].second * decay + reverberance * reverbBuffer[i % delayInSamples].second;
+    }
+}
+void AudioSignal::fadeOut(double duration) {
+    double fadeSamples = duration * rate;
+    double fadeIncrement = 1.0 / fadeSamples;
+
+    for (size_t i = 0; i < fadeSamples && i < values.size(); ++i) {
+        double fade = 1 - (fadeIncrement * i);
+        values[i].second *= fade;
+    }
+}
+void AudioSignal::fadeIn(double duration) {
+    double fadeSamples = duration * rate;
+    double fadeIncrement = 1.0 / fadeSamples;
+
+    for (size_t i = 0; i < fadeSamples && i < values.size(); ++i) {
+        double fade =  (fadeIncrement * i);
+        values[i].second *= fade;
+    }
+}
+void AudioSignal::adjustVolume(double factor) {
+    for (long long i = 0; i < values.size(); ++i) {
+        values[i].second = static_cast<int16_t>(values[i].second * factor);
+    }
+}
+void AudioSignal::applyEcho(double delay, double decay) {
+    double delayInSamples = static_cast<double>((delay*2 * rate));
+    std::vector<std::pair<double, double>> delayedValues(values.size(), { 0.0, 0.0 });
+
+    for (long long  i = 0; i < values.size(); ++i) {
+        if (i >= delayInSamples) {
+            delayedValues[i].first = values[i - delayInSamples].first * decay;
+            delayedValues[i].second = values[i - delayInSamples].second * decay;
+        }
+        // Chỉ cộng âm thanh trễ với âm thanh gốc nếu chúng cùng có dữ liệu
+        if (i <= values.size() - delay) {
+            values[i].first += delayedValues[i].first;
+            values[i].second += delayedValues[i].second;
+        }
+    }
+}
+
+
 
 void AudioSignal::timeShift(long long pandemic) {
     std::vector<std::pair<double, double>> shifted_values(values.size() + std::abs(pandemic));
