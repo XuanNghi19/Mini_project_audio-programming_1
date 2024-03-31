@@ -142,8 +142,12 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\assets\AJR_Bummerland.wav" />
+    <Media Include="..\assets\ajr_lpf.wav" />
     <Media Include="..\assets\demo1.wav" />
     <Media Include="..\assets\demo2.wav" />
+    <Media Include="..\assets\test1.wav" />
+    <Media Include="..\assets\test2.wav" />
+    <Media Include="..\assets\together_alone.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
