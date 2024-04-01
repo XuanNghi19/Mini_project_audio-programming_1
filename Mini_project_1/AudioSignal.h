@@ -22,9 +22,9 @@ public:
 	void applyEcho(double delay, double decay);
 	void adjustVolume(double factor);
 	void fadeIn(double duration);
-	/*void reverb(int delayMilliseconds, float decay);*/
 	void applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance);
 	void fadeOut(double duration);
+	void applyFlangingEffect(double A, double r0, double f, double fs);
 	AudioSignal operator+(const AudioSignal& other) const;
 	AudioSignal operator*(const AudioSignal& other) const;
 	AudioSignal multiplyConstant(double constant) const;

@@ -18,17 +18,22 @@ AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double r
     this->rate = rate;
 }
 
-//void AudioSignal::reverb( int delayMilliseconds, float decay) {
-//    //int delayMilliseconds = 500; // half a second
-//    int delaySamples =
-//        (int)((float)delayMilliseconds * 44.1f); // assumes 44100 Hz sample rate
-//    /*float decay = 0.5f;*/
-//    for (int i = 0; i < values.size() - delaySamples; i++)
-//    {
-//        // WARNING: overflow potential
-//        values[i + delaySamples] += (short)((float)values[i] * decay);
-//    }
-//}
+void AudioSignal::applyFlangingEffect(double A, double r0, double f, double fs) {
+    for (int n = 0; n < values.size(); ++n) {
+        double delayedSampleIndex = n - (r0 / 2) * (1 - sin(2 * M_PI * f * n / fs));
+        int delayedSampleIndex_floor = (int)floor(delayedSampleIndex);
+        int delayedSampleIndex_ceil = (int)ceil(delayedSampleIndex);
+
+        double delayedSample = 0.0;
+        if (delayedSampleIndex_floor >= 0 && delayedSampleIndex_ceil < values.size()) {
+            double fraction = delayedSampleIndex - delayedSampleIndex_floor;
+            double delayedSampleValue = (1 - fraction) * values[delayedSampleIndex_floor].second + fraction * values[delayedSampleIndex_ceil].second;
+            delayedSample = delayedSampleValue;
+        }
+        values[n].second += A * delayedSample;
+    }
+}
+
 void AudioSignal::applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance) {
     int delayInSamples = static_cast<int>(delayInMs * rate / 1000.0);
     std::vector<std::pair<double, double>> reverbBuffer(delayInSamples, { 0.0, 0.0 });
@@ -67,7 +72,7 @@ void AudioSignal::adjustVolume(double factor) {
     }
 }
 void AudioSignal::applyEcho(double delay, double decay) {
-    double delayInSamples = static_cast<double>((delay*2 * rate));
+    double delayInSamples = static_cast<double>((delay * rate));
     std::vector<std::pair<double, double>> delayedValues(values.size(), { 0.0, 0.0 });
 
     for (long long  i = 0; i < values.size(); ++i) {

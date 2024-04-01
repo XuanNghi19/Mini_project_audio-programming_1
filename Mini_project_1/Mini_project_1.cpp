@@ -241,10 +241,6 @@ void bsf() {
 }
 
 void filter() {
-    if (!save) {
-        openWavFile(audioSignal1);
-    }
-
     std::cout << "Choose a filter\n";
     std::cout << "  1. Low pass filter\n";
     std::cout << "  2. Hight pass filter\n";
@@ -268,6 +264,8 @@ void filter() {
     case 4:
         bsf();
         break;
+    case 0:
+        break;
     }
 
     saveSignal();
@@ -278,9 +276,119 @@ void echo() {
     if (!save) {
         openWavFile(audioSignal1);
     }
-    audioSignal1.applyReverb(0.5,1,50,1,0.88);
+    double delay, decay;
+    std::cout << "Enter the delay period: ";
+    std::cin >> delay;
+    std::cout << "Enter the volume decay coefficient: ";
+    std::cin >> decay;
+    audioSignal1.applyEcho(delay, decay);
+}
+
+void amplify() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    double factor;
+    std::cout << "Enter the volume up and down coefficient: ";
+    std::cin >> factor;
+    audioSignal1.adjustVolume(factor);
+}
+
+void fadeIn() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    double duration;
+    std::cout << "Enter the time fade in: ";
+    std::cin >> duration;
+    audioSignal1.fadeIn(duration);
+}
+
+void fadeOut() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    double duration;
+    std::cout << "Enter the time fade out: ";
+    std::cin >> duration;
+    audioSignal1.fadeOut(duration);
+}
+
+void reverb() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    double decay, mix, delayInMs, wet, reverberance;
+    std::cout << "Enter the volume decay coefficient: ";
+    std::cin >> decay;
+    std::cout << "Enter the ratio between the original signal and the Reverb signal: ";
+    std::cin >> mix;
+    std::cout << "Enter the delay time(ms): ";
+    std::cin >> delayInMs;
+    std::cout << "Enter the ratio of the Reverb signal to be added to the original signal: ";
+    std::cin >> wet;
+    std::cout << "Enter the coefficient showing the level of the reverb effect: ";
+    std::cin >> reverberance;
+    audioSignal1.applyReverb(decay, mix, delayInMs, wet, reverberance);
+}
+
+void flanging() {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
+    double A, r0, f, fs;
+    std::cout << "Enter the amplitude (A): ";
+    std::cin >> A;
+    std::cout << "Enter the delay time (r0 in milliseconds): ";
+    std::cin >> r0;
+    std::cout << "Enter the modulation frequency (f): ";
+    std::cin >> f;
+    std::cout << "Enter the sampling frequency (fs): ";
+    std::cin >> fs;
+
+    audioSignal1.applyFlangingEffect(A, r0, f, fs);
+}
+
+
+void effect() {
+
+    std::cout << "Choose a effect\n";
+    std::cout << "  1. Echo\n";
+    std::cout << "  2. Amplify\n";
+    std::cout << "  3. Fade in\n";
+    std::cout << "  4. Fade out\n";
+    std::cout << "  5. Reverb\n";
+    std::cout << "  6. Flanging\n";
+    std::cout << "  0. Quit\n";
+    int sl = 0;
+    std::cout << "Select: ";
+    std::cin >> sl;
+    switch (sl)
+    {
+    case 1:
+        echo();
+        break;
+    case 2:
+        amplify();
+        break;
+    case 3:
+        fadeIn();
+        break;
+    case 4:
+        fadeOut();
+        break;
+    case 5:
+        reverb();
+        break;
+    case 6:
+        flanging();
+        break;
+    case 0:
+        break;
+    }
 
     saveSignal();
+    plot();
 }
 
 int main()
@@ -334,7 +442,7 @@ int main()
             filter();
             break;
         case 9:
-            
+            effect();
             break;
         case 10:
             drawDiagram();
