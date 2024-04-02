@@ -41,13 +41,16 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\assets\AJR_Bummerland.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>assets</Filter>
     </Media>
     <Media Include="..\assets\demo1.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>assets</Filter>
     </Media>
     <Media Include="..\assets\demo2.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>assets</Filter>
+    </Media>
+    <Media Include="..\assets\together_alone.wav">
+      <Filter>assets</Filter>
     </Media>
   </ItemGroup>
 </Project>

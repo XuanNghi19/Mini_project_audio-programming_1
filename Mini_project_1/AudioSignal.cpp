@@ -18,18 +18,20 @@ AudioSignal::AudioSignal(std::vector<std::pair<double, double>> values, double r
     this->rate = rate;
 }
 
-void AudioSignal::applyFlangingEffect(double A, double r0, double f, double fs) {
-    for (int n = 0; n < values.size(); ++n) {
-        double delayedSampleIndex = n - (r0 / 2) * (1 - sin(2 * M_PI * f * n / fs));
-        int delayedSampleIndex_floor = (int)floor(delayedSampleIndex);
-        int delayedSampleIndex_ceil = (int)ceil(delayedSampleIndex);
+void AudioSignal::applyFlangingEffect(double A, double r0, double f) {
+    for (size_t n = 0; n < values.size(); ++n) {
+        double delayedSampleIndex = n - (r0 / 2) * (1 - sin((2 * M_PI * f * values[n].first) / rate));
+        int delayedSampleIndex_floor = static_cast<int>(floor(delayedSampleIndex));
+        int delayedSampleIndex_ceil = static_cast<int>(ceil(delayedSampleIndex));
 
         double delayedSample = 0.0;
-        if (delayedSampleIndex_floor >= 0 && delayedSampleIndex_ceil < values.size()) {
+        if (delayedSampleIndex_floor >= 0 && static_cast<size_t>(delayedSampleIndex_ceil) < values.size()) {
             double fraction = delayedSampleIndex - delayedSampleIndex_floor;
-            double delayedSampleValue = (1 - fraction) * values[delayedSampleIndex_floor].second + fraction * values[delayedSampleIndex_ceil].second;
+            double delayedSampleValue = (1 - fraction) * values[delayedSampleIndex_floor].second
+                + fraction * values[delayedSampleIndex_ceil].second;
             delayedSample = delayedSampleValue;
         }
+
         values[n].second += A * delayedSample;
     }
 }

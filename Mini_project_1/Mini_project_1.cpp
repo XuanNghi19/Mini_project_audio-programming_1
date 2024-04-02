@@ -337,16 +337,14 @@ void flanging() {
         openWavFile(audioSignal1);
     }
     double A, r0, f, fs;
-    std::cout << "Enter the amplitude (A): ";
+    std::cout << "Enter the amplifier coefficient (0 -> 1): ";
     std::cin >> A;
-    std::cout << "Enter the delay time (r0 in milliseconds): ";
+    std::cout << "Enter the maximum latency: ";
     std::cin >> r0;
-    std::cout << "Enter the modulation frequency (f): ";
+    std::cout << "Enter the frequency of the lag control: ";
     std::cin >> f;
-    std::cout << "Enter the sampling frequency (fs): ";
-    std::cin >> fs;
 
-    audioSignal1.applyFlangingEffect(A, r0, f, fs);
+    audioSignal1.applyFlangingEffect(A, r0, f);
 }
 
 

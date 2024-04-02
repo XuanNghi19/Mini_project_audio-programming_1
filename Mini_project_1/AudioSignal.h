@@ -24,7 +24,7 @@ public:
 	void fadeIn(double duration);
 	void applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance);
 	void fadeOut(double duration);
-	void applyFlangingEffect(double A, double r0, double f, double fs);
+	void applyFlangingEffect(double A, double r0, double f);
 	AudioSignal operator+(const AudioSignal& other) const;
 	AudioSignal operator*(const AudioSignal& other) const;
 	AudioSignal multiplyConstant(double constant) const;
