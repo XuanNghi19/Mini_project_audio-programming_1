@@ -265,7 +265,7 @@ void filter() {
         bsf();
         break;
     case 0:
-        break;
+        return;
     }
 
     saveSignal();
@@ -382,7 +382,7 @@ void effect() {
         flanging();
         break;
     case 0:
-        break;
+        return;
     }
 
     saveSignal();
