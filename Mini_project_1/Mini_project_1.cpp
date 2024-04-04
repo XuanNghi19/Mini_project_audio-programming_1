@@ -191,51 +191,62 @@ void playSound() {
     wav.playWav("");
 }
 
-
-void lpf() {
+void lpf(int window) {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
     double fc;
     int N;
     std::cout << "Enter the cutting frequency(fc): ";
     std::cin >> fc;
     std::cout << "Enter the steps of the filter(N): ";
     std::cin >> N;
-    AudioSignal::LPF(audioSignal1, fc, audioSignal1.getRate(), N);
+    AudioSignal::LPF(audioSignal1, fc, audioSignal1.getRate(), N, window);
 
     std::cout << "LPF Filtered!\n";
 }
 
-void hpf() {
+void hpf(int window) {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
     double fc;
     int N;
     std::cout << "Enter the cutting frequency(fc): ";
     std::cin >> fc;
     std::cout << "Enter the steps of the filter(N): ";
     std::cin >> N;
-    AudioSignal::HPF(audioSignal1, fc, audioSignal1.getRate(), N);
+    AudioSignal::HPF(audioSignal1, fc, audioSignal1.getRate(), N, window);
 
     std::cout << "HPF Filtered!\n";
 }
 
-void bpf() {
+void bpf(int window) {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
     double fc1, fc2;
     int N;
     std::cout << "Enter 2 cutting frequency(fc1, fc2): ";
     std::cin >> fc1 >> fc2;
     std::cout << "Enter the steps of the filter(N): ";
     std::cin >> N;
-    AudioSignal::BPF(audioSignal1, fc1, fc2, audioSignal1.getRate(), N);
+    AudioSignal::BPF(audioSignal1, fc1, fc2, audioSignal1.getRate(), N, window);
 
     std::cout << "BPF Filtered!\n";
 }
 
-void bsf() {
+void bsf(int window) {
+    if (!save) {
+        openWavFile(audioSignal1);
+    }
     double fc1, fc2;
     int N;
     std::cout << "Enter 2 cutting frequency(fc1, fc2): ";
     std::cin >> fc1 >> fc2;
     std::cout << "Enter the steps of the filter(N): ";
     std::cin >> N;
-    AudioSignal::BSF(audioSignal1, fc1, fc2, audioSignal1.getRate(), N);
+    AudioSignal::BSF(audioSignal1, fc1, fc2, audioSignal1.getRate(), N, window);
 
     std::cout << "BSF Filtered!\n";
 }
@@ -250,19 +261,26 @@ void filter() {
     int sl = 0;
     std::cout << "Select: ";
     std::cin >> sl;
+    std::cout << "Choose function window\n";
+    std::cout << "  1. Rectangle\n";
+    std::cout << "  2. Hanning\n";
+    std::cout << "  3. Hamming\n";
+    int window;
+    std::cout << "Select: ";
+    std::cin >> window;
     switch (sl)
     {
     case 1:
-        lpf();
+        lpf(window);
         break;
     case 2:
-        hpf();
+        hpf(window);
         break;
     case 3:
-        bpf();
+        bpf(window);
         break;
     case 4:
-        bsf();
+        bsf(window);
         break;
     case 0:
         return;
@@ -329,7 +347,7 @@ void reverb() {
     std::cin >> wet;
     std::cout << "Enter the coefficient showing the level of the reverb effect: ";
     std::cin >> reverberance;
-    audioSignal1.applyReverb(decay, mix, delayInMs, wet, reverberance);
+    audioSignal1.applyReverb(decay, mix, delayInMs, wet, reverberance, wav.getWavHeader());
 }
 
 void flanging() {
@@ -346,7 +364,6 @@ void flanging() {
 
     audioSignal1.applyFlangingEffect(A, r0, f);
 }
-
 
 void effect() {
 
@@ -389,6 +406,20 @@ void effect() {
     plot();
 }
 
+void cross_correlation() {
+    if (!save) {
+        std::cout << "Select signal file 1\n";
+        openWavFile(audioSignal1);
+    }
+    std::cout << "Select signal file 2\n";
+    openWavFile(audioSignal2);
+
+    audioSignal1 = audioSignal1.cross_correlation(audioSignal2);
+
+    saveSignal();
+    plot();
+}
+
 int main()
 {  
     bool flag = true;
@@ -408,6 +439,7 @@ int main()
         std::cout << "              11.Play sound\n";
         std::cout << "              12.Open file\n";
         std::cout << "              13.Save file\n";
+        std::cout << "              14.Cross correlation\n";
         std::cout << "              0. Quit\n";
         std::cout << "__________________________________________________________\n";
         std::cout << "Select: ";
@@ -453,6 +485,9 @@ int main()
             break;
         case 13:
             audioSignal1.writeWavFile(wav.getWavHeader());
+            break;
+        case 14:
+            cross_correlation();
             break;
         case 0:
             flag = false;

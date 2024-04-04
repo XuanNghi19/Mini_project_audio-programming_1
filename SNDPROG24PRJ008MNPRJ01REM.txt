@@ -1,0 +1,479 @@
+READ ME
+Đây là phần mềm được xây dựng bằng ngôn ngữ C++ sử dụng để đọc ghi file .wav và chỉnh sửa chúng theo các thuật toán.
+
+AudioSignal.h: Dùng để khai báo phương thức và thuộc tính của đối tượng
+AudioSignal.cpp : Dùng để thực thi các phương thức được khai báo trong AudioSignal.h
+gnuplot-iostream.h : Sử dụng để liên kết với phần mềm gnuplot
+wav.h : Dùng để khai báo các phương thức và thuộc tính liên quan đến file wav.
+wav.cpp : Dùng để thực thi các phương thức được khai báo trong wav.h như chạy file wav, đọc file wav...
+Mini_project_1.cpp: Đây là file mã nguồn chính để chạy chương trình, có thể sử dụng các chức năng trên terminal
+
+Chú ý: Chương trình được phát triển trên Microsoft Visual Studio 2022, và cần cài 1 số thư viện phụ trợ để có thể
+biên dịch chương trình.
+
+Cài đặt thư viện:
+*Requirement:
++ Windows 7 hoặc mới hơn
++ Git
++ MS Visual Studio 2015 hoặc mới hơn
+
+1. Sử dụng Terminal cài vcpkg 
+> git clone https://github.com/microsoft/vcpkg
+> .\vcpkg\bootstrap-vcpkg.bat
+2. Cài các thư viện cần thiết qua vcpkg
+.\vcpkg install boost-utility
+.\vcpkg install boost-iostreams
+.\vcpkg install boost-filesystem
+.\vcpkg install libsndfile
+.\vcpkg install sfml
+3. Kết nối MS Visual Studio với vcpkg:
+> .\vcpkg integrate install
+
+Cài đặt gnu-plot:
+1.Download gnuplot tại http://www.gnuplot.info/download.html
+2.Install gnuplot và đảm bảo gnuplot.exe đúng đường dẫn C:\Program Files\gnuplot\bin\gnuplot.exe\
+
+ 
+Testcase:
+
+Test case 1 : 
+Mô tả: Phép dịch thời gian
+Step: 
+    + Chạy chương trình -> Chọn 1
+    + Chọn file wav muốn xử lý.
+    + Nhập một số n
+    + Chọn y / n để chọn có lưu file âm thanh cho lần tiếp theo hay không
+    + Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
+    + Chọn 13 để lưu file âm thanh.
+    + Nhập tên file âm thanh
+Input: 
+1
+demo1.wav ( File âm thanh gốc)
+500
+y
+y
+13
+timeshift
+Expected Output: 
+Hiển thị đồ thị sóng đã dịch n đơn vị của file âm thanh
+timeshift.wav ( File âm thanh đã qua xử lý được dịch chuyển 500 đơn vị)
+Actual Output:
+Hiển thị đồ thị sóng đã dịch n đơn vị của file âm thanh
+timeshift.wav ( File âm thanh đã qua xử lý được dịch chuyển 500 đơn vị)
+Result: Pass
+
+Test case 2:
+Mô tả: Phép đảo ngược thời gian
+Step:
++ Chạy chương trình -> Chọn 2
++ Chọn file wav muốn xử lý.
++ Chọn y / n để chọn có lưu file âm thanh cho lần tiếp theo hay không
++ Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh
+Input:
+2
+demo1.wav (File âm thanh gốc)
+y
+y
+13
+timereverse
+Expected Output:
+Hiển thị đồ thị sóng đã đảo ngược thời gian của file âm thanh
+timereverse.wav (File âm thanh đã qua xử lý được đảo ngược thời gian)
+Actual Output:
+Hiển thị đồ thị sóng đã đảo ngược thời gian của file âm thanh
+timereverse.wav (File âm thanh đã qua xử lý được đảo ngược thời gian)
+Result: Pass
+
+Test case 3:
+Mô tả: Phép tích chập tín hiệu 
+Step:
++ Chạy chương trình -> Chọn 4 
++ Chọn file wav thứ nhất.
++ Chọn file wav thứ hai.
++ Chọn y / n để chọn có lưu file âm thanh cho lần tiếp theo hay không
++ Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
++ Nhập tên file đầu ra cho kết quả của phép tích chập.
+Input:
+4
+file1.wav (File wav thứ nhất)
+file2.wav (File wav thứ hai)
+y
+n
+convolution_result
+Expected Output:
+File wav "convolution_result.wav" chứa kết quả của phép tích chập được tạo ra.
+Actual Output:
+File wav "convolution_result.wav" chứa kết quả của phép tích chập được tạo ra.
+Result: Pass
+
+Test case 4:
+Mô tả: Giảm tần số lấy mẫu
+Step:
++ Chạy chương trình -> Chọn 6 
++ Chọn file wav muốn xử lý.
++ Nhập số lần giảm tần số lấy mẫu n.
++ Chọn y / n để chọn có lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
+Input:
+6
+audio.wav (File âm thanh gốc với tần số 44.1kHz )
+2 (số lần giảm tần số lấy mẫu)
+y
+y
+13
+downsampled_audio (Tên file đầu ra cho kết quả downsampling)
+Expected Output:
+Hiển thị biểu đồ của kết quả downsampling.
+downsampled_audio.wav ( File âm thanh có tần số 22kHZ)
+Actual Output:
+Hiển thị biểu đồ của kết quả downsampling.
+downsampled_audio.wav ( File âm thanh có tần số 22kHZ)
+Result: Pass
+
+Test case 5:
+Mô tả: Tăng tần số lấy mẫu
+Step:
++ Chạy chương trình -> Chọn 7
++ Chọn file wav muốn xử lý.
++ Nhập số lần tăng tần số lấy mẫu n.
++ Chọn y / n để chọn có lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+7
+audio.wav (File âm thanh gốc tần số 44.1kHZ)
+2 (số lần tăng tần số lấy mẫu)
+y
+n
+13
+upsampled_audio (Tên file đầu ra cho kết quả upsampling)
+Expected Output:
+upsampled_audio.wav" ( File âm thanh được upsampling có tần số 88.2kHz)
+Actual Output:
+upsampled_audio.wav" ( File âm thanh được upsampling có tần số 88.2kHz)
+Result: Pass
+
+Test case 6:
+Mô tả: Phép cộng hai tín hiệu rời rạc với hiển thị biểu đồ và lưu file
+Step:
++ Chạy chương trình -> Chọn 3
++ Chọn file wav thứ nhất.
++ Chọn file wav thứ hai.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn hiển thị biểu đồ của kết quả hay không.
++ Nhập tên file đầu ra cho kết quả của phép cộng.
+Input:
+3
+file1.wav (File wav thứ nhất)
+file2.wav (File wav thứ hai)
+y
+y
+sum_result (Tên file đầu ra cho kết quả của phép cộng)
+Expected Output:
+Hiển thị đồ thị của kết quả phép cộng.
+sum_result.wav (chứa kết quả của phép cộng được tạo ra)
+Actual Output:
+Hiển thị đồ thị của kết quả phép cộng.
+sum_result.wav (chứa kết quả của phép cộng được tạo ra)
+Result: Pass
+
+Test case 7:
+Mô tả: Nhân hằng số với tín hiệu rời rạc
+Step:
++ Chạy chương trình -> Chọn 5 
++ Chọn file wav muốn xử lí.
++ Nhập hằng số cần nhân với tín hiệu.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+5
+audio.wav (File âm thanh)
+2.5 (Hằng số cần nhân với tín hiệu)
+y
+y
+output_audio (Tên file đầu ra cho kết quả của phép nhân)
+Expected Output:
+Hiển thị đồ thị của kết quả phép nhân.
+output_audio.wav (chứa kết quả của phép nhân được tạo ra)
+Actual Output:
+Hiển thị đồ thị của kết quả phép nhân.
+output_audio.wav (chứa kết quả của phép nhân được tạo ra)
+Result: Pass
+
+Test case 8:
+Mô tả: Áp dụng hiệu ứng Echo
+Step:
++ Chạy chương trình -> Chọn 9 (Effect) -> Chọn 1 (Echo)
++ Chọn file wav muốn áp dụng hiệu ứng.
++ Nhập giá trị decay (tỷ lệ suy giảm của âmplitude) và delay (độ trễ của echo).
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+4
+1
+audio.wav (File âm thanh)
+0.6 (Decay)
+0.5 (Delay)
+y
+n
+output_audio (Tên file đầu ra cho kết quả của hiệu ứng Echo)
+Expected Output:
+output_audio.wav (File âm thanh thêm hiệu ứng echo)
+Actual Output:
+output_audio.wav (File âm thanh thêm hiệu ứng echo)
+Result: Pass
+
+Test case 9:
+Mô tả: Áp dụng hiệu ứng Amplify
+Step:
+Chạy chương trình -> Chọn 9 (Effect) -> Chọn 2 (Amplify)
+Chọn file wav muốn áp dụng hiệu ứng.
+Nhập hệ số tăng âm lượng.
+Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
+Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
+Chọn 13 để lưu file âm thanh.
+Nhập tên file âm thanh.
+Input:
+4
+2
+1.5 (Hệ số tăng âm lượng)
+audio.wav (File âm thanh)
+y
+n
+output_audio.wav (Tên file đầu ra cho kết quả của hiệu ứng Amplify)
+Expected Output:
+output_audio.wav ( File âm thanh áp hiệu ứng)
+Actual Output:
+output_audio.wav ( File âm thanh áp hiệu ứng)
+Result: Pass
+
+Test case 10 :
+Mô tả: Áp dụng hiệu ứng Fade In
+Step:
++ Chạy chương trình -> Chọn 9 (Effect) -> Chọn 3 (Fade In)
++ Chọn file wav muốn áp dụng hiệu ứng.
++ Nhập số giây fade.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+4
+3
+audio.wav (File âm thanh)
+5 (Số giây fade)
+y
+n
+output_audio (Tên file đầu ra cho kết quả của hiệu ứng Fade In)
+Expected Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Fade In.
+Actual Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Fade In.
+Result: Pass
+
+Test case 11 :
+Mô tả: Áp dụng hiệu ứng Fade Out
+Step:
++ Chạy chương trình -> Chọn 9 (Effect) -> Chọn 4 (Fade Out)
++ Chọn file wav muốn áp dụng hiệu ứng.
++ Nhập số giây fade.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+4
+3
+audio.wav (File âm thanh)
+2 (Số giây fade)
+y
+n
+output_audio (Tên file đầu ra cho kết quả của hiệu ứng Fade Out)
+Expected Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Fade Out.
+Actual Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Fade Out.
+Result: Pass
+
+Test case 12:
+Mô tả: Áp dụng hiệu ứng Reverb
+Step:
++ Chạy chương trình -> Chọn 9-> Chọn 5 
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập giá trị decay.
++ Nhập giá trị mix delay
++ Nhập ms.
++ Nhập giá trị wet.
++ Nhập giá trị reverberance.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+4
+5
+audio.wav
+0.5
+1
+100
+1
+0.88
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Reverb.
+Actual Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Reverb.
+Result: Pass
+
+
+Test case 13:
+Mô tả: Áp dụng hiệu ứng Flanger
+Step:
++ Chạy chương trình -> Chọn 9 -> Chọn 6 
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập giá trị a
++ Nhập giá trị delay
++ Nhập f tần số điều khiển của độ trễ
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+4
+6
+audio.wav
+0.6
+1
+11
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Flanger.
+Actual Output:
+File âm thanh "output_audio.wav" chứa kết quả của hiệu ứng Flanger.
+Result: Pass
+
+
+Test case 14:
+Mô tả: Áp dụng LPF
+Step:
++ Chạy chương trình -> Chọn 8 -> Chọn 1
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập fc tần số cắt
++ Nhập L bậc của bộ lọc
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+8
+1
+audio.wav
+1000
+21
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc LPF.
+Actual Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc LPF.
+Result: Pass
+
+Test case 15:
+Mô tả: Áp dụng HPF
+Step:
++ Chạy chương trình -> Chọn 8 -> Chọn 2
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập fc tần số cắt
++ Nhập L bậc của bộ lọc
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+8
+2
+audio.wav
+1000
+21
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc HPF.
+Actual Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc HPF.
+Result: Pass
+
+Test case 16:
+Mô tả: Áp dụng BPF
+Step:
++ Chạy chương trình -> Chọn 8 -> Chọn 3
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập fc1.
++ Nhập fc2.
++ Nhập L.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+8
+3
+audio.wav
+2000
+3000
+21
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc BPF.
+Actual Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc BPF.
+Result: Pass
+
+Test case 17:
+Mô tả: Áp dụng BSF
+Step:
++ Chạy chương trình -> Chọn 8 -> Chọn 4
++ Chọn file wav để áp dụng hiệu ứng.
++ Nhập fc1.
++ Nhập fc2.
++ Nhập L.
++ Chọn y / n để chọn có muốn lưu file âm thanh cho lần tiếp theo hay không.
++ Chọn y / n để chọn có muốn vẽ biểu đồ của kết quả hay không.
++ Chọn 13 để lưu file âm thanh.
++ Nhập tên file âm thanh.
+Input:
+8
+3
+audio.wav
+1000
+2000
+21
+y
+n
+13
+output_audio.
+Expected Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc BSF.
+Actual Output:
+File âm thanh "output_audio.wav" đã qua bộ lọc BSF.
+Result: Pass

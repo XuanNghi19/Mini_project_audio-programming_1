@@ -36,8 +36,8 @@ void AudioSignal::applyFlangingEffect(double A, double r0, double f) {
     }
 }
 
-void AudioSignal::applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance) {
-    int delayInSamples = static_cast<int>(delayInMs * rate / 1000.0);
+void AudioSignal::applyReverb(double decay, double mix, double delayInMs, double wet, double reverberance, WavHeader wavHeader) {
+    int delayInSamples = static_cast<int>(delayInMs * wavHeader.numChannels * rate / 1000.0);
     std::vector<std::pair<double, double>> reverbBuffer(delayInSamples, { 0.0, 0.0 });
 
     for (int i = 0; i < values.size(); ++i) {
@@ -397,9 +397,31 @@ AudioSignal AudioSignal::multiplyConstant(double constant) const {
     return AudioSignal(result, rate);
 }
 
-void AudioSignal::LPF(AudioSignal &refAudioSignal, double fc, double fs, int N) {
-    std::vector<std::pair<double, double>> h;
-    h.resize(N);
+AudioSignal AudioSignal::cross_correlation(AudioSignal other) {
+    AudioSignal x_AudioSignal(values, rate);
+    other.reverseTime();
+    AudioSignal h_AudioSignal = other;
+    
+    return x_AudioSignal * h_AudioSignal;
+}
+
+double AudioSignal::windows(int window, int n, int N) {
+    switch (window)
+    {
+    case 1:
+        return 1.0;
+        break;
+    case 2:
+        return (0.5 - (0.5 * (cos(2 * M_PI * n) / (N - 1))));
+        break;
+    case 3:
+        return (0.54 - (0.46 * (cos(2 * M_PI * n) / (N - 1))));
+        break;
+    }
+}
+
+void AudioSignal::LPF(AudioSignal &refAudioSignal, double fc, double fs, int N, int window) {
+    std::vector<std::pair<double, double>> h(N);
     double omegac = (2 * M_PI * fc) / fs;
 
     for (int n = 0; n < N; n++) {
@@ -413,15 +435,18 @@ void AudioSignal::LPF(AudioSignal &refAudioSignal, double fc, double fs, int N) 
         else {
             h[n].second = (omegac / M_PI) * (sin(x) / x);
         }
+
+        h[n].second *= windows(window, n, N);
     }
 
     AudioSignal filter(h, fs);
+    
     refAudioSignal = refAudioSignal * filter;
+
 }
 
-void AudioSignal::HPF(AudioSignal &refAudioSignal, double fc, double fs, int N) {
-    std::vector<std::pair<double, double>> h;
-    h.resize(N);
+void AudioSignal::HPF(AudioSignal &refAudioSignal, double fc, double fs, int N, int window) {
+    std::vector<std::pair<double, double>> h(N), w(N);
     double omegac = (2 * M_PI * fc) / fs;
 
     for (int n = 0; n < N; n++) {
@@ -435,17 +460,20 @@ void AudioSignal::HPF(AudioSignal &refAudioSignal, double fc, double fs, int N) 
         else {
             h[n].second = -(omegac / M_PI) * (sin(x) / x);
         }
+
+        h[n].second *= windows(window, n, N);
     }
 
     AudioSignal filter(h, fs);
+
     refAudioSignal = refAudioSignal * filter;
 }
 
-void AudioSignal::BPF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N) {
-    std::vector<std::pair<double, double>> h;
-    h.resize(N);
-    double omegac1 = (2 * M_PI * fc1) / fs; // tần số thấp
-    double omegac2 = (2 * M_PI * fc2) / fs; // tần số cao
+void AudioSignal::BPF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N, int window) {
+    std::vector<std::pair<double, double>> h(N), w(N);
+
+    double omegac1 = (2 * M_PI * fc1) / fs;
+    double omegac2 = (2 * M_PI * fc2) / fs;
 
     for (int n = 0; n < N; n++) {
         h[n].first = n; 
@@ -457,17 +485,19 @@ void AudioSignal::BPF(AudioSignal &refAudioSignal, double fc1, double fc2, doubl
 
         h[n].second = ((omegac2 / M_PI) * sinc2) - ((omegac1 / M_PI) * sinc1);
 
+        h[n].second *= windows(window, n, N);
     }
 
     AudioSignal filter(h, fs);
+
     refAudioSignal = refAudioSignal * filter;
 }
 
-void AudioSignal::BSF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N) {
-    std::vector<std::pair<double, double>> h;
-    h.resize(N);
-    double omegac1 = (2 * M_PI * fc1) / fs; // tần số thấp
-    double omegac2 = (2 * M_PI * fc2) / fs; // tần số cao
+void AudioSignal::BSF(AudioSignal &refAudioSignal, double fc1, double fc2, double fs, int N, int window) {
+    std::vector<std::pair<double, double>> h(N), w(N);
+
+    double omegac1 = (2 * M_PI * fc1) / fs;
+    double omegac2 = (2 * M_PI * fc2) / fs;
 
     for (int n = 0; n < N; n++) {
         h[n].first = n;
@@ -486,8 +516,11 @@ void AudioSignal::BSF(AudioSignal &refAudioSignal, double fc1, double fc2, doubl
             h[n].second = -(((omegac2 / M_PI) * sinc2) - ((omegac1 / M_PI) * sinc1));
         }
 
+        h[n].second *= windows(window, n, N);
+
     }
 
     AudioSignal filter(h, fs);
+
     refAudioSignal = refAudioSignal * filter;
 }
